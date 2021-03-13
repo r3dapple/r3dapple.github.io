@@ -63,8 +63,9 @@ class CartesianCoordinateSystem {
 	 */
 	constructor(canvasname, scalex, scaley, xdense, ydense, translatex, translatey, cartfunc, guifunc, sliderinpfunc, slidposxstar, slidposystar, sliderlen, totslidnum){
 
-		this.canvas = $("#" + canvasname)[0];
-		this.canvas.width = $("#" + canvasname).parent().width() - $("#" + canvasname).parent().width() * 0.0;
+		this.jquerycanvas = $("#" + canvasname);
+		this.canvas = this.jquerycanvas[0];
+		this.canvas.width = this.jquerycanvas.parent().width() - this.jquerycanvas.parent().width() * 0.0;
 		this.ctx = this.canvas.getContext('2d');
 		this.width = this.canvas.width;
 		this.height = this.canvas.height;
@@ -198,11 +199,11 @@ class CartesianCoordinateSystem {
 	}
 
 	updateOrientation(){
-		/*this.canvas.width = $(window).width() * 0.88;
-		this.width = $(window).width() * 0.88;
+		this.canvas.width = this.canvas.width = this.jquerycanvas.parent().width();
+		this.width = this.canvas.width = this.jquerycanvas.parent().width();
 		this.navx = this.width - this.navbtnwidth - 5;
 		this.navy = this.height - 105;
-		this.drawFirstFrame();*/
+		this.drawFirstFrame();
 	}
 
 	drawNavigationButton(x, y, w, h, xoff, yoff, x1, x2, x3, y1, y2, y3){

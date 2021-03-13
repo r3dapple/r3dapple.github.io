@@ -1,3 +1,8 @@
+
+html {
+	overflow-x: hidden; 
+}
+
 body {
 background: #606060 url(bg.jpg);
 -webkit-background-size: cover;
@@ -7,6 +12,7 @@ background-size: cover;
 background-position: center;
 background-repeat: no-repeat;
 background-attachment: fixed;
+overflow-x: hidden; 
 }
 
 .container {
@@ -16,19 +22,37 @@ padding: 50px 0px;
 
 .card{
 width: 80%;
-box-sizing: 0px 0px 1px 1px #ccc;
 position: relative;
+display: block;
 margin: 0px auto;
 }
 
 .box{
-width: 100%;
+width: 90%;
 padding: 20px;
 background: rgba(245,245,245,.96);
 border-radius: 10px;
 display: block;
 float: left;
 margin-bottom: 20px;
+}
+
+.box pre{
+overflow-x: auto;
+}
+
+.katex-display {
+overflow-x: auto;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+table tr {
+    word-wrap: break-word;         /* All browsers since IE 5.5+ */
+    overflow-wrap: break-word;     /* Renamed property in CSS3 draft spec */
 }
 
 .subbox{
