@@ -1,3 +1,11 @@
+/*
+* Copyright 2021 Markus Heimerl, OTH Regensburg
+* Licensed under CC BY-NC 4.0
+*
+* ANY USE OF THIS SOFTWARE MUST COMPLY WITH THE
+* CREATIVE COMMONS ATTRIBUTION-NONCOMMERCIAL 4.0 INTERNATIONAL LICENSE
+* AGREEMENTS
+*/
 // --- COMPLEX NUMBERS ---
 class Complex{
 	constructor(real, imaginary){

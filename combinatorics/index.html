@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>one page to rule them all</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Description" content="Markus Heimerl's personal page for learning and visualizing various complex concepts.">
+		<link rel="stylesheet" type="text/css" href="/style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Hind">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+	</head>
+
+	<body>
+		<div class="navbar">
+			<div class="left"><a style="color: white;" href="/">markusheimerl.com</a></div>
+			<a class="hoverable" href="/about">About</a>
+			<a class="hoverable" href="/contact">Contact</a>
+			<a class="hoverable" href="/licenses">Licenses</a>
+			<a class="hoverable" href="/">Blog</a>
+			<div class="right"><a href="https://creativecommons.org/licenses/by-nc/4.0/"><img src="https://licensebuttons.net/l/by-nc/4.0/88x31.png" alt="ccbync4"></a></div>
+		</div>
+		<div class="container">
+			<div class="card">
+				<div class="box">
+					<h1>Combinatorics</h1>
+
+					<div class="row"><small>Last changed: 17.03.21</small></div>
+					<hr class="solid">
+					
+					<h3>1.1 Kartesisches Produkt von Mengen</h3>
+					Wieviele Paare kann man der Form (a,b) aus den endlichen Mengen A und B bilden?
+					$$|A| * |B|$$
+					
+					Kartesisches Produkt:
+					A1, A2,...,An seien endliche Mengen. Die Menge aller Vektoren (a1, a2, ..., an) mit ai e Ai heißt kartesisches Produkt der Mengen A1, A2, ... An.
+					
+					Anzal der Elemente des katesischen Produkts:
+					$$A_{1} \times A_{2} \times ... \times A_{n} = \prod_{i=1}^{n} |A_{i}|$$
+					
+					Spezialfall: Sind A, B disjunkt, dann sind \(A \times B\) und \(B \times A\) ebenfalls disjunkt.
+					
+					Wenn nun die Reihenfolge der Elemente der Paare einen Unterschied macht, gibt es 
+					$$|A \times B| + |B \times A|$$
+					Kombinationsmöglichkeiten der Elemente der endlichen Mengen A, B.
+					
+					<h3>1.2 Permutationen</h3>
+					Menge A mit N Elementen. Auf wieviele Weisen können diese N Elemente sortiert werden?
+					$$N!$$
+					$$0! := 1$$
+					Bemerkung: Die Anzahl der Permutationen einer endlichen Menge A entspricht der Anzahl der bijektiven Abbildungen der Menge A auf sich selbst.<br>
+					
+					Die Menge aller bijektiven Abbildungen (aller Permutationen) von A (mit |A| = n) auf sich selbst bildet eine Gruppe; man nennt sie die symmetrische Gruppe vom Grad n, als Symbol \(S_{n}\) (mit \(|S_{n}| = n!\)).<br>
+	
+					Wird ein Element n einer Menge A bei einer Permutation auf sich selbst abgebildet, heißt n Fixpunkt.<br>
+					Arten der Darstellung von Permutationen: Zyklendarstellung, Bild auf Urbilddarstellung und Komposition (Hintereinanderausführung)<br>
+					
+					Fakt: Jede Permutatuon lässt sich als Komposition von Transpositionen darstellen (d.h. man kann jede Parmutation durch endliche viele paarweise Vertauschungen realisieren).<br>
+					
+					Die darstellung einer Permutation durch wiederholte Vertauschungen ist nicht eindeutig, es sind aber entweder immer eine gerade oder immer eine ungerade Zahl an Vertauschungen nötig. Man spricht von der Parität einer Permutation.<br>
+
+					<h3>1.3 Auswahl mit und ohne Zurücklegen</h3>
+					<table style="width:100%; position: center">
+						<tr>
+							<th>Anzahl der Möglichkeiten n aus N Elementen auszuwählen</th>
+							<th>mit Zurücklegen</th>
+							<th>ohne Zurücklegen</th>
+						</tr>
+						<tr>
+							<th>mit Berücksichtigung der Reihenfolge</th>
+							<th>\(N^n\)</th>
+							<th>\(\frac{N!}{(N-n)!}\)</th>
+						</tr>
+						<tr>
+							<th>ohne Berücksichtigung der Reihenfolge</th>
+							<th>\(\binom{N+n-1}{n}\)</th>
+							<th>\(\frac{N!}{(N-n)! * n!} = \binom{N}{n}\)</th>
+						</tr>
+					</table>
+					
+					<h4>Einschub: Binomialkoeffizienten</h4>
+					<p>1. \(\binom{N}{0} = 1\), \(\binom{N}{N} = 1\), \(\binom{N}{1} = N\)</p>
+					<p>2. \(\binom{N}{n} = \binom{N}{N-n}\)</p>
+					<p>3. \(\binom{N}{n} = \binom{N-1}{n-1} + \binom{N-1}{n}\)</p>
+					<p>4. \((a+b)^N =\sum\limits_{i=0}^{N}\binom{N}{i}a^ib^{N-i}\)</p>
+					<p>Pascalsche Dreieck: Darstellung des Binomialkoeffizienten</p>
+					
+					<h4>Verallgemeinerung: Multinomialkoeffizienten:</h4>
+					<p>Fragestellung: N Elemente sind in endlich viele (unterscheidbare) Gruppen der Größen \(n_1, n_2, ... n_k\) aufzusteilen. Auf wie viele Weisen kann das geschehen?<br>
+					Wähle zunächst \(n_1\) Elemente für Gruppe 1 aus: \(\binom{N}{n_1}\) Möglichkeiten.<br>
+					Wähle dann \(n_2\) Elemente für Gruppe 2 aus: \(\binom{N-n_1}{n_2}\) Möglichkeiten, usw.<br>
+					Insgesamt gibt es \(\binom{N!}{\prod_{i=1}^{k} n_{i}!}\)</p>
+					
+					<h4>Kombinatorikaufgaben:</h4>
+					<p>Wieviele "binäre Wörter" mit zehn Stellen gibt es (d.h. jeder "Buchstabe" ist 0 oder 1)?</p>
+					<p>\(2^{10}\)</p>
+					<p>Wieviele "binäre Wörter" mit zehn Stellen gibt es in denen genau sechs Mal eine 1 vorkommt?</p>
+					<p>\(\binom{10}{6}\)</p>
+					<p>10 maliges Würfeln. Wie viele Ergebnisse (mit Reihenfolge) gibt es?</p>
+					<p>\(6^{10}\)</p>
+					<p>Wie viele Ergebnisse, in denen keine einzige 6 vorkommt?</p>
+					<p>\(5^{10}\)</p>
+					<p>Wie viele Ergebnisse, in denen mindestens eine 6 vorkommt?</p>
+					<p>\(6^{10} - 5^{10}\)</p>
+					<p>Wie viele Ergebnisse, in denen höchstens zwei Mal eine 6 vorkommt?<br>
+					Tipp: "höchstens" bzw. "mindestens" muss man (meistens) in die einzelnen Möglichketien zerlegen
+					</p> 
+					<p>\(5^{10} + 10*5^{10} + \binom{10}{2}*5^{8}\)</p>
+					<p>Wie viele Lottoziehungen (ohne Ziehungsreihenfolge) gibt es, bei denen alle 6 gezogenen Zahlen gerade sind?</p> 
+					<p>\(\binom{24}{6}\)</p>
+					<p>Wie viele Lottoziehungen enthalten genau 3 gerade und 3 ungerade Zahlen?</p> 
+					<p>\(\binom{25}{3} * \binom{24}{3}\)</p>
+					<p>10 Ehepaare, also 20 Personen, stellen sich für ein Foto nebeneinander auf. Wie viele verschiedene Reihenfolgen gibt es für diese Aufstellung?</p> 
+					<p>\(20!\)</p>
+					<p>Wie viele Aufstellungen gibt es, wenn Ehepartner stets nebeneinadner stehen wollen?</p> 
+					<p>\(10! * (2!)^{10}\)</p>
+					
+					<div class="row"><small>Last changed: 22.03.21</small></div>
+					<h4>1.4 Einschluss Ausschluss Formel</h4>
+					<p>Seien  \(A_{1}, A_{2}, ..., A_{n}\) beliebige endliche Mengen, und sei \(A = \bigcup\limits_{i = 1}^{n} A_{i}\), dann gilt:</p>
+					<p>\(|A| = \sum\limits_{\substack{M \subset {1, ..., n} \\ M \neq \emptyset}} (-1)^{|M|+1} * |\bigcap_{i \in M}  A_{i}|\)</p>
+					<p>Aufgaben:<p>
+					<p>Wie viele natürliche Zahlen kleiner oder gleich 10000 gibt es, die durch 3, 5 oder 7 teilbar sind? <br>
+					\(|A_{1}| = 10000/3\) <br>
+					\(|A_{2}| = 10000/5\) <br>
+					\(|A_{3}| = 10000/7\) <br>
+					\(|A_{1} \cap A_{2}| = 10000/kgV(3,5) = 10000/15\) <br>
+					\(|A_{1} \cap A_{3}| = 10000/kgV(3,7)\) <br>
+					\(|A_{2} \cap A_{3}| = 10000/kgV(5,7)\) <br> 
+					\(|A_{2} \cap A_{2} \cap A_{3}| = 10000/kgV(3,5,7) = 1000/105\) <br>
+					Jetzt in Formel von oben...
+					</p>
+					<p>Beispiel: Fixpunktfreie Permutationen</p>
+					<h4>1.5 Rekursionsformeln</h4>
+					<p>Es ist oft notwendig komplexe kombinatorische Probleme durch Verkettung bzw. rekursiver Anwendung der oben genannten Formeln.</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
