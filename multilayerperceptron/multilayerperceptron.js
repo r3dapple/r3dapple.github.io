@@ -300,7 +300,7 @@ function feedforwardvisualisation(){
 	var ctxtop = canvastop.getContext("2d");
 	var equationimage = new Image();
 	var legendimage = new Image();
-	legendimage.src = "legend.png";
+	legendimage.src = "legend.PNG";
 	var fastforwardx = 920;
 	var fastforwardy = 100;
 
