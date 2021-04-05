@@ -277,7 +277,7 @@ DONE:
 */
 
 // --- FEED FORWARD VISUALISATION ---
-setTimeout(feedforwardvisualisation, 1000);
+setTimeout(feedforwardvisualisation, 3000);
 function feedforwardvisualisation(){
 	
 	// so the loop should just keep on drawing. And draw a certain neuron red. We specify with this variable here which one that is.
