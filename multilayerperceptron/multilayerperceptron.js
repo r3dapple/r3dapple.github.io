@@ -35,6 +35,7 @@ var neuronsobject = {};
 var globalinputdatapointer = -1;
 var infoimage = -1;
 var ffphasestring = "None";
+var running = false;
 
 function readIntFromHeap(u8addr){
 	var addr = 0;
@@ -67,8 +68,13 @@ function getBias(arr, neuronindex, biasandweightsvaluebuffer){
 function resizeTo(canvas, xscale, yscale, x_min, y_min){
 	var context = canvas.getContext("2d");
 	var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-	var newCanvas = $("<canvas>").attr("width", imageData.width*50).attr("height", imageData.height*50)[0];
-
+	var newCanvas = $("<canvas>").attr("width", imageData.width/* *50 */).attr("height", imageData.height/* *50 had to be removed bc of firefox bug*/)[0];
+	/*var newCanvas = document.createElement('canvas');
+	newCanvas.width  = imageData.width;
+	newCanvas.height = imageData.height;
+	var newContext = newCanvas.getContext("2d");
+	newContext.putImageData(imageData, 0, 0);*/
+	
 	newCanvas.getContext("2d").putImageData(imageData, 0, 0);
 	
 	context.clearRect(0, 0, canvas.width, canvas.height);
@@ -260,6 +266,8 @@ $("#recognizestart").click(function(e){
 	//printNeuron(neuronsobject.allneuronsarray, 784+199);
 	globalinputdatapointer = datapointer;
 	ffphasestring = "Feed Input Data";
+	running = true;
+	initNeurons();
 });
 
 /*
@@ -388,7 +396,7 @@ function feedforwardvisualisation(){
 		ctxtop.lineTo(fastforwardx+navbuttonheight+navbuttonheight+7, fastforwardy-navbuttonwidth);
 		ctxtop.stroke();
 		
-		requestAnimationFrame(topinfoLoop);
+		if(running)requestAnimationFrame(topinfoLoop);
 	}
 	
 	
@@ -446,7 +454,7 @@ function feedforwardvisualisation(){
 			stepApplySigmoid(neuronsobject.allneuronsarray, sigmoidsteppingnetworkindex);
 			sigmoidsteppingnetworkindex++;
 		}
-		setTimeout(sigmoidStepping, animationsteppingspeed);
+		if(running)setTimeout(sigmoidStepping, animationsteppingspeed);
 	}
 
 	var weightindexlocal = -1;
@@ -489,7 +497,7 @@ function feedforwardvisualisation(){
 				}
 			}
 		}
-		setTimeout(feedForwardStepping, animationsteppingspeed);
+		if(running)setTimeout(feedForwardStepping, animationsteppingspeed);
 	}
 
 
@@ -513,7 +521,7 @@ function feedforwardvisualisation(){
 			}
 		}
 		if(stepfeednetworkindex < 784) {
-			setTimeout(feedStepping, animationsteppingspeed);
+			if(running)setTimeout(feedStepping, animationsteppingspeed);
 		}else{
 			// reset
 			ffphasestring = "Feed Forward";
@@ -523,7 +531,7 @@ function feedforwardvisualisation(){
 			neuronthatsredindex = -1;
 			globalinputdatapointer = -1;
 			stepfeednetworkindex = 0;
-			setTimeout(feedStepping, animationsteppingspeed);
+			if(running)setTimeout(feedStepping, animationsteppingspeed);
 		}
 	}
 	
@@ -619,7 +627,7 @@ function feedforwardvisualisation(){
 			ctx.stroke();
 			ctx.fill();
 		}
-		requestAnimationFrame(feedforwarddrawloop);
+		if(running)requestAnimationFrame(feedforwarddrawloop);
 	}
 
 }
