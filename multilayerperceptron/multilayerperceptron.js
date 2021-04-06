@@ -270,6 +270,7 @@ TODO:
 - being able to repeat recognition without reloading the page
 - make equation PNGs
 - remove topoffset variable
+- https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Statements/try...catch
 DONE:
 - USE NETWORK THATS TRAINED ON 0 TO 1 NORMALISATION NAMED 100_epoch_64_batchsize_relu_alpha0point5_784_200_10_0_to_1_normalization.network - DONE
 - fast forward this layer button - DONE
@@ -277,7 +278,19 @@ DONE:
 */
 
 // --- FEED FORWARD VISUALISATION ---
-setTimeout(feedforwardvisualisation, 3000);
+initNeurons();
+function initNeurons(){
+	try {
+		neuronsobject.allneuronsarray = getAllNeuronsAndWeights("assets/100_epoch_64_batchsize_relu_alpha0point5_784_200_10_0_to_1_normalization_95_09%.network");
+		feedforwardvisualisation();
+	}
+	catch (e) {
+		console.log(e);
+		setTimeout(initNeurons, 500);
+	}
+}
+
+//setTimeout(feedforwardvisualisation, 5);
 function feedforwardvisualisation(){
 	
 	// so the loop should just keep on drawing. And draw a certain neuron red. We specify with this variable here which one that is.
@@ -408,7 +421,7 @@ function feedforwardvisualisation(){
 
 	// we kinda have to get all the weights
 	// neuronsobject.allneuronsarray = getAllNeuronsAndWeights("assets/100_epoch_64_batchsize_relu_alpha0point5_784_200_10_95_13%.network");
-	neuronsobject.allneuronsarray = getAllNeuronsAndWeights("assets/100_epoch_64_batchsize_relu_alpha0point5_784_200_10_0_to_1_normalization_95_09%.network");
+	
 
 	var sigmoidsteppingnetworkindex = 0;
 	sigmoidStepping();
