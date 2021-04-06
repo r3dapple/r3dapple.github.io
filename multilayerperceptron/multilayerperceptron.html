@@ -12,6 +12,7 @@
 
 	<body>
 		<pre><code data-language="javascript">/*
+/*
 * Copyright 2021 Markus Heimerl, OTH Regensburg
 * Licensed under CC BY-NC 4.0
 *
@@ -48,6 +49,7 @@ var neuronsobject = {};
 var globalinputdatapointer = -1;
 var infoimage = -1;
 var ffphasestring = "None";
+var running = false;
 
 function readIntFromHeap(u8addr){
 	var addr = 0;
@@ -80,8 +82,13 @@ function getBias(arr, neuronindex, biasandweightsvaluebuffer){
 function resizeTo(canvas, xscale, yscale, x_min, y_min){
 	var context = canvas.getContext("2d");
 	var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-	var newCanvas = $("&lt;canvas&gt;").attr("width", imageData.width*50).attr("height", imageData.height*50)[0];
-
+	var newCanvas = $("<canvas>").attr("width", imageData.width/* *50 */).attr("height", imageData.height/* *50 had to be removed bc of firefox bug*/)[0];
+	/*var newCanvas = document.createElement('canvas');
+	newCanvas.width  = imageData.width;
+	newCanvas.height = imageData.height;
+	var newContext = newCanvas.getContext("2d");
+	newContext.putImageData(imageData, 0, 0);*/
+	
 	newCanvas.getContext("2d").putImageData(imageData, 0, 0);
 	
 	context.clearRect(0, 0, canvas.width, canvas.height);
@@ -273,6 +280,8 @@ $("#recognizestart").click(function(e){
 	//printNeuron(neuronsobject.allneuronsarray, 784+199);
 	globalinputdatapointer = datapointer;
 	ffphasestring = "Feed Input Data";
+	running = true;
+	initNeurons();
 });
 
 /*
@@ -283,6 +292,7 @@ TODO:
 - being able to repeat recognition without reloading the page
 - make equation PNGs
 - remove topoffset variable
+- https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Statements/try...catch
 DONE:
 - USE NETWORK THATS TRAINED ON 0 TO 1 NORMALISATION NAMED 100_epoch_64_batchsize_relu_alpha0point5_784_200_10_0_to_1_normalization.network - DONE
 - fast forward this layer button - DONE
@@ -290,7 +300,19 @@ DONE:
 */
 
 // --- FEED FORWARD VISUALISATION ---
-setTimeout(feedforwardvisualisation, 1000);
+initNeurons();
+function initNeurons(){
+	try {
+		neuronsobject.allneuronsarray = getAllNeuronsAndWeights("assets/100_epoch_64_batchsize_relu_alpha0point5_784_200_10_0_to_1_normalization_95_09%.network");
+		feedforwardvisualisation();
+	}
+	catch (e) {
+		console.log(e);
+		setTimeout(initNeurons, 500);
+	}
+}
+
+//setTimeout(feedforwardvisualisation, 5);
 function feedforwardvisualisation(){
 	
 	// so the loop should just keep on drawing. And draw a certain neuron red. We specify with this variable here which one that is.
@@ -313,7 +335,7 @@ function feedforwardvisualisation(){
 	var ctxtop = canvastop.getContext("2d");
 	var equationimage = new Image();
 	var legendimage = new Image();
-	legendimage.src = "legend.png";
+	legendimage.src = "legend.PNG";
 	var fastforwardx = 920;
 	var fastforwardy = 100;
 
@@ -388,7 +410,7 @@ function feedforwardvisualisation(){
 		ctxtop.lineTo(fastforwardx+navbuttonheight+navbuttonheight+7, fastforwardy-navbuttonwidth);
 		ctxtop.stroke();
 		
-		requestAnimationFrame(topinfoLoop);
+		if(running)requestAnimationFrame(topinfoLoop);
 	}
 	
 	
@@ -421,7 +443,7 @@ function feedforwardvisualisation(){
 
 	// we kinda have to get all the weights
 	// neuronsobject.allneuronsarray = getAllNeuronsAndWeights("assets/100_epoch_64_batchsize_relu_alpha0point5_784_200_10_95_13%.network");
-	neuronsobject.allneuronsarray = getAllNeuronsAndWeights("assets/100_epoch_64_batchsize_relu_alpha0point5_784_200_10_0_to_1_normalization_95_09%.network");
+	
 
 	var sigmoidsteppingnetworkindex = 0;
 	sigmoidStepping();
@@ -446,7 +468,7 @@ function feedforwardvisualisation(){
 			stepApplySigmoid(neuronsobject.allneuronsarray, sigmoidsteppingnetworkindex);
 			sigmoidsteppingnetworkindex++;
 		}
-		setTimeout(sigmoidStepping, animationsteppingspeed);
+		if(running)setTimeout(sigmoidStepping, animationsteppingspeed);
 	}
 
 	var weightindexlocal = -1;
@@ -489,7 +511,7 @@ function feedforwardvisualisation(){
 				}
 			}
 		}
-		setTimeout(feedForwardStepping, animationsteppingspeed);
+		if(running)setTimeout(feedForwardStepping, animationsteppingspeed);
 	}
 
 
@@ -513,7 +535,7 @@ function feedforwardvisualisation(){
 			}
 		}
 		if(stepfeednetworkindex < 784) {
-			setTimeout(feedStepping, animationsteppingspeed);
+			if(running)setTimeout(feedStepping, animationsteppingspeed);
 		}else{
 			// reset
 			ffphasestring = "Feed Forward";
@@ -523,7 +545,7 @@ function feedforwardvisualisation(){
 			neuronthatsredindex = -1;
 			globalinputdatapointer = -1;
 			stepfeednetworkindex = 0;
-			setTimeout(feedStepping, animationsteppingspeed);
+			if(running)setTimeout(feedStepping, animationsteppingspeed);
 		}
 	}
 	
@@ -619,10 +641,11 @@ function feedforwardvisualisation(){
 			ctx.stroke();
 			ctx.fill();
 		}
-		requestAnimationFrame(feedforwarddrawloop);
+		if(running)requestAnimationFrame(feedforwarddrawloop);
 	}
 
 }
+
 </code></pre>	
 		
 		<script src="/lib/rainbow-custom.min.js"></script>	
