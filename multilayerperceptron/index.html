@@ -32,8 +32,6 @@
 					<hr class="solid">
 					
 					<!-- ADD TAGS -->
-					<!-- create pretty code viewer instead of simple links to source -->
-					<!-- google fonts license and move katex license notice somewhere else. Maybe make an entire exterior page for exterior code and IP and note their licenses there -->
 					<!-- remove js warning from emscripten glue code function.js file -->				
 					<p>
 					This is a <a href="ann.html">self written</a> fully connected neural network with three layers, trained on the <a href="http://yann.lecun.com/exdb/mnist/">MNIST database</a> of handwritten digits.
@@ -45,7 +43,7 @@
 					<p>
 					The network is written in C and compiled with Emscripten to run in the browser. The visualisation is a pure <a href="multilayerperceptron.html">javascript canvas</a>.
 					The input is first centered around mass then rescaled to fit its bounding box into 200x200 and finally downscaled to 28x28.
-					For communication between webassembly and javascript the HEAP macro of Emscripten is used. For floating points it was useful to transform them to a char array using C functions
+					For communication between webassembly and javascript the HEAP macro of <a href="https://emscripten.org/index.html">Emscripten</a> is used. For floating points it was useful to transform them to a char array using C functions
 					and interpreting that with javascripts parseFloat.
 					</p>
 					<p>

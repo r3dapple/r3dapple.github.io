@@ -22,12 +22,13 @@ var stepFeedForward = Module.cwrap('stepFeedForward', 'number', ['number', 'numb
 var fastForwardFeedForwardOfThisLayer = Module.cwrap('fastForwardFeedForwardOfThisLayer', 'number', ['number', 'number', 'number', 'number']);
 var stepApplySigmoid = Module.cwrap('stepApplySigmoid', 'number', ['number', 'number']);
 
+/*
 if( /Android|webOS|iPhone|iPad|Mac|Macintosh|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
 	$("#multilayerperceptroncanvas")[0].style.display = "none";
 	$("#multilayerperceptronfeedforwardtopinfo")[0].style.display = "none";
 	$("#multilayerperceptronfeedforward")[0].style.display = "none";
 }
-
+*/
 
 var canvas = $("#multilayerperceptroncanvas")[0];
 var ctx = canvas.getContext("2d");

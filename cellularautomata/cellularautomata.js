@@ -6,6 +6,7 @@
 * CREATIVE COMMONS ATTRIBUTION-NONCOMMERCIAL 4.0 INTERNATIONAL LICENSE
 * AGREEMENTS
 */
+
 function getBaseLog(x, y) {
   return Math.log(y) / Math.log(x);
 }
@@ -174,7 +175,6 @@ function cellularautomaton(){
 
 		var fb = gl.createFramebuffer();
 
-			
 		mainloop();
 		function mainloop(){
 			if(running){

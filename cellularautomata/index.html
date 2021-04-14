@@ -117,9 +117,16 @@
 					<a href="/lib/r3webgl.js">My WebGL 1 Library</a>
 					</p>
 					<canvas id="cellularautomatoncanvasmultineighbor" width="1024" height="512" role="img" aria-label="cellularautomatoncanvasmultineighbor"></canvas>
+					
+					<h2>Spicing things up with extra dimensions</h2>
+					<button id="webglstudytoggle">Stop</button>
+					<!-- tabindex="1" needed for focus on object. So when I click on it, it focuses and the added eventListener for "keydown" triggers -->
+					<!-- <canvas tabindex="1" id="webglstudycanvas" width="1024" height="512" role="img" aria-label="webglstudycanvas"></canvas> -->
 					<script src="/lib/r3webgl.js"></script>
 					<script src="cellularautomata.js"></script>
 					<script src="cellularautomatamulti.js"></script>
+					<script src="vertex_data.js"></script>
+					<script src="cellauto3d.js"></script>
 				</div>
 			</div>
 		</div>
