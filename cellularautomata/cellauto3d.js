@@ -1,22 +1,100 @@
 /*
 * Copyright 2021 Markus Heimerl, OTH Regensburg, r3dapple.de
-* Licensed under CC BY-SA 4.0
+* Licensed under CC BY-NC 4.0
 * r3dapple.de/LICENSE.txt
 *
 * ANY USE OF THIS SOFTWARE MUST COMPLY WITH THE
-* CREATIVE COMMONS ATTRIBUTION-SHAREALIKE 4.0 INTERNATIONAL LICENSE
+* CREATIVE COMMONS ATTRIBUTION-NONCOMMERCIAL 4.0 INTERNATIONAL LICENSE
 * AGREEMENTS
 */
 
 cellularautomata3d();
 function cellularautomata3d(){
 
-	
-	var cellgrid = [][][];
+	function createCellGridWireframe(cellularworldsize, randomize){
+		var cellgrid = [];
+		for(var x = 0; x < cellularworldsize; x++){
+			cellgrid[x] = [];
+			for(var y = 0; y < cellularworldsize; y++){
+				cellgrid[x][y] = [];
+				for(var z = 0; z < cellularworldsize; z++){
+					if(randomize)cellgrid[x][y][z] = Math.random() >= 0.5 ? 1 : 0;
+					else cellgrid[x][y][z] = 0;
+					
+					// mark world edges
+					if(y == 0 && z == 0) cellgrid[x][y][z] = 1;
+					if(x == 0 && z == 0) cellgrid[x][y][z] = 1;
+					if(x == 0 && y == 0) cellgrid[x][y][z] = 1;
+					
+					if(y == cellularworldsize-1 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					if(x == cellularworldsize-1 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					if(x == cellularworldsize-1 && y == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					
+					if(y == cellularworldsize-1 && z == 0) cellgrid[x][y][z] = 1;
+					if(x == cellularworldsize-1 && z == 0) cellgrid[x][y][z] = 1;
+					if(x == cellularworldsize-1 && y == 0) cellgrid[x][y][z] = 1;
+					
+					if(y == 0 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					if(x == 0 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					if(x == 0 && y == cellularworldsize-1) cellgrid[x][y][z] = 1;
+				}
+			}
+		}
+		return cellgrid;
+	}
+
+	var cellularworldsize = 60;
+	var cellgrid = createCellGridWireframe(cellularworldsize, true);
+	var rulefactor = 2;
+
 	cellularAutomataLogic();
 	function cellularAutomataLogic(){
-		if(running){}
-		
+		if(running){
+			
+			var cellgridnextframe = createCellGridWireframe(cellularworldsize, false);
+			
+			for(var x = 2; x < cellularworldsize-2; x++){
+				for(var y = 2; y < cellularworldsize-2; y++){
+					for(var z = 2; z < cellularworldsize-2; z++){
+						// get cell status
+						var status = cellgrid[x][y][z];
+						
+						// get neighbor count
+						var zm1 = z-1 < 2 ? cellularworldsize-3 : z-1;
+						var zp1 = z+1 == cellularworldsize-2 ? 2 : z+1;
+						var ym1 = y-1 < 2 ? cellularworldsize-3 : y-1;
+						var yp1 = y+1 == cellularworldsize-2 ? 2 : y+1;
+						var xm1 = x-1 < 2 ? cellularworldsize-3 : x-1;
+						var xp1 = x+1 == cellularworldsize-2 ? 2 : x+1;
+						
+						// below
+						var neighborcount = cellgrid[x][y][zm1] + cellgrid[x][yp1][zm1] + cellgrid[x][ym1][zm1] + cellgrid[xp1][y][zm1] 
+											+ cellgrid[xm1][y][zm1] + cellgrid[xp1][yp1][zm1] + cellgrid[xp1][ym1][zm1] + cellgrid[xm1][ym1][zm1] + cellgrid[xm1][yp1][zm1];
+						
+						// level
+						neighborcount += cellgrid[x][yp1][z] + cellgrid[x][ym1][z] + cellgrid[xp1][y][z] 
+											+ cellgrid[xm1][y][z] + cellgrid[xp1][yp1][z] + cellgrid[xp1][ym1][z] + cellgrid[xm1][ym1][z] + cellgrid[xm1][yp1][z];
+											
+						// above
+						neighborcount += cellgrid[x][y][zp1] + cellgrid[x][yp1][zp1] + cellgrid[x][ym1][zp1] + cellgrid[xp1][y][zp1] 
+											+ cellgrid[xm1][y][zp1] + cellgrid[xp1][yp1][zp1] + cellgrid[xp1][ym1][zp1] + cellgrid[xm1][ym1][zp1] + cellgrid[xm1][yp1][zp1];
+											
+						// if cell alive and neiborcount 2,3 or 8, it stays alive
+						if(status == 1 && (/*neighborcount == 2*rulefactor ||*/ neighborcount == 26 || neighborcount == 10*rulefactor)){
+							cellgridnextframe[x][y][z] = 1;
+						}
+						// if cell is dead and neighborcount is 3, it is born
+						else if(status == 0 && (/*neighborcount == 5 ||*/ neighborcount == 4)){
+							cellgridnextframe[x][y][z] = 1;
+						}
+						// in all other cases the cell remains dead or dies (already initialized as 0)
+					}
+				}
+			}
+			
+			cellgrid = cellgridnextframe;
+		}
+		setTimeout(cellularAutomataLogic, 100);
 	}
 
 
@@ -92,7 +170,6 @@ function cellularautomata3d(){
 		uniform mat4 modelmatrix;
 		uniform mat4 projectionmatrix;
 		uniform mat4 viewmatrix;
-		uniform mat4 inversetransposemodelmatrix;
 
 		varying vec2 o_texturecoordinate;
 		varying vec3 o_normal;
@@ -178,7 +255,7 @@ function cellularautomata3d(){
 
 	// --- GET ALL ATTRIBUTE AND UNIFORM LOCATIONS
 	const attribLocations = r3webgl.getAttribLocations(program, ["vertexposition", "texturecoordinate", "normal"]);
-	const uniformLocations = r3webgl.getUniformLocations(program, ["modelmatrix", "viewmatrix", "projectionmatrix", "texture", "reverseLightDirection", "inversetransposemodelmatrix"]);
+	const uniformLocations = r3webgl.getUniformLocations(program, ["modelmatrix", "viewmatrix", "projectionmatrix", "texture", "reverseLightDirection"]);
 
 	// --- INIT 3D ---
 	r3webgl.init3D();
@@ -226,9 +303,6 @@ function cellularautomata3d(){
 	// --- ENABLE TEXTURE0 ---
 	gl.uniform1i(uniformLocations.texture, 0);
 
-
-
-
 	var angle = 0.0;
 	var rotationspeed = 15.2;
 	var camerapos = [0.0, 0.0, 0.0];
@@ -263,23 +337,24 @@ function cellularautomata3d(){
 			var lookatposition = [lookatmatrix[12], lookatmatrix[13], lookatmatrix[14]];
 
 
-			// --- FIRST PERSON CAMERA --- 
+			// --- FIRST PERSON CAMERA ---
+			var movementspeed = 0.8;
 			var factorws = (keys["w"] ? 1 : keys["s"] ? -1 : 0);
-			lookatposition[0] += Math.sin(m4.degreeToRadians(viewxz))*10*factorws;
-			lookatposition[1] += Math.sin(m4.degreeToRadians(viewy))*10*factorws;
-			lookatposition[2] += Math.cos(m4.degreeToRadians(viewxz))*10*factorws;
-			camerapos[0] += Math.sin(m4.degreeToRadians(viewxz))*10*factorws;
-			camerapos[1] += Math.sin(m4.degreeToRadians(viewy))*10*factorws;
-			camerapos[2] += Math.cos(m4.degreeToRadians(viewxz))*10*factorws;
+			lookatposition[0] += Math.sin(m4.degreeToRadians(viewxz))*movementspeed*factorws;
+			lookatposition[1] += Math.sin(m4.degreeToRadians(viewy))*movementspeed*factorws;
+			lookatposition[2] += Math.cos(m4.degreeToRadians(viewxz))*movementspeed*factorws;
+			camerapos[0] += Math.sin(m4.degreeToRadians(viewxz))*movementspeed*factorws;
+			camerapos[1] += Math.sin(m4.degreeToRadians(viewy))*movementspeed*factorws;
+			camerapos[2] += Math.cos(m4.degreeToRadians(viewxz))*movementspeed*factorws;
 
 			var factorad = (keys["d"] ? 1 : keys["a"] ? -1 : 0);
 			var movcamvector = m4.cross([Math.sin(m4.degreeToRadians(viewxz)), Math.sin(m4.degreeToRadians(viewy)), Math.cos(m4.degreeToRadians(viewxz))], [0,1,0]);
-			lookatposition[0] += movcamvector[0]*10*factorad;
-			lookatposition[2] += movcamvector[2]*10*factorad;
-			camerapos[0] += movcamvector[0]*10*factorad;
-			camerapos[2] += movcamvector[2]*10*factorad;
+			lookatposition[0] += movcamvector[0]*movementspeed*factorad;
+			lookatposition[2] += movcamvector[2]*movementspeed*factorad;
+			camerapos[0] += movcamvector[0]*movementspeed*factorad;
+			camerapos[2] += movcamvector[2]*movementspeed*factorad;
 
-			var factoreq = (keys["e"] ? 10 : keys["q"] ? -10 : 0);
+			var factoreq = (keys["e"] ? movementspeed : keys["q"] ? -movementspeed : 0);
 			lookatposition[1] += factoreq;
 			camerapos[1] += factoreq;
 			
@@ -290,34 +365,24 @@ function cellularautomata3d(){
 			var viewmatrixlocation = gl.getUniformLocation(program, "viewmatrix");
 			gl.uniformMatrix4fv(uniformLocations.viewmatrix, false, viewmatrix);
 
+
+			// --- CONNECT BUFFERS TO ATTRIBUTES --- (only has to be done once since the only object vertex data we ever need is that of a cube)
+			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubevertexbuffer, attribLocations.vertexposition, 3, true);
+			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubenormalbuffer, attribLocations.normal, 3, true);
+			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubetexcoordbuffer, attribLocations.texturecoordinate, 2, true);
+			
+			
 			// -- DRAW ---
-			for(var i = 0; i < 1; i++){
-
-				r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, vertexbuffer, attribLocations.vertexposition, 3, true);
-				r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, normalbuffer, attribLocations.normal, 3, true);
-				r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, texcoordbuffer, attribLocations.texturecoordinate, 2, true);
-			
-				
-				gl.bindTexture(gl.TEXTURE_2D, texture);
-
-				var modelmatrix = r3webgl.createModelMatrix(500, 0, 0, 0, -angle, 0, 1, 1, 1);
-				gl.uniformMatrix4fv(uniformLocations.modelmatrix, false, modelmatrix);
-				gl.uniformMatrix4fv(uniformLocations.inversetransposemodelmatrix, false, m4.transpose(m4.inverse(modelmatrix)));
-				gl.drawArrays(gl.TRIANGLES, 0, 96);
-
-
-				r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubevertexbuffer, attribLocations.vertexposition, 3, true);
-				r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubenormalbuffer, attribLocations.normal, 3, true);
-				r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubetexcoordbuffer, attribLocations.texturecoordinate, 2, true);
-			
-				gl.bindTexture(gl.TEXTURE_2D, texturecube);
-
-				var cubemodelmatrix = r3webgl.createModelMatrix(0, 0, 500, 0, /*angle*/0, 0, 100, 100, 100);
-				gl.uniformMatrix4fv(uniformLocations.modelmatrix, false, cubemodelmatrix);
-				gl.uniformMatrix4fv(uniformLocations.inversetransposemodelmatrix, false, m4.transpose(m4.inverse(modelmatrix)));
-				gl.drawArrays(gl.TRIANGLES, 0, /*6*2*3*/ 20000000);
-				
-
+			gl.bindTexture(gl.TEXTURE_2D, texturecube);
+			for(var x = 0; x < cellularworldsize; x++){
+				for(var y = 0; y < cellularworldsize; y++){
+					for(var z = 0; z < cellularworldsize; z++){
+						if(cellgrid[x][y][z] == 1){
+							gl.uniformMatrix4fv(uniformLocations.modelmatrix, false, r3webgl.createModelMatrix(x, y, z, 0, 0, 0, 0.5, 0.5, 0.5));
+							gl.drawArrays(gl.TRIANGLES, 0, 6*2*3 /*this has a lot less*/);
+						}
+					}
+				}
 			}
 
 		}

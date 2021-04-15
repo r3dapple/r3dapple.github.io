@@ -41,16 +41,16 @@
 					It trained for 200 epochs with 64 samples per batch and a static learning rate of 0.5. It achieved 95% accuracy on the test set.
 					</p>
 					<p>
-					The network is written in C and compiled with Emscripten to run in the browser. The visualisation is a pure <a href="multilayerperceptron.html">javascript canvas</a>.
+					The network is written in C and compiled with <a href="https://emscripten.org/index.html">Emscripten</a> to run in the browser. The visualisation is a pure <a href="multilayerperceptron.html">javascript canvas</a>.
 					The input is first centered around mass then rescaled to fit its bounding box into 200x200 and finally downscaled to 28x28.
-					For communication between webassembly and javascript the HEAP macro of <a href="https://emscripten.org/index.html">Emscripten</a> is used. For floating points it was useful to transform them to a char array using C functions
+					For communication between webassembly and javascript the HEAP macro of Emscripten is used. For floating points it was useful to transform them to a char array using C functions
 					and interpreting that with javascripts parseFloat.
 					</p>
 					<p>
 					The MNIST dataset is filled with american digits, so it might not recognize your version of certain numbers.
 					</p>
 					<img class="center" src="mnist_showcase.png" alt="mnist_showcase" width="50%" height="50%">
-					<small class="center">Sample of the MNIST training data</small>
+					<small class="center">Sample of the MNIST training data from <a href="https://en.wikipedia.org/wiki/MNIST_database#/media/File:MnistExamples.png">Wikipedia</a></small>
 					<h2>Feed Forward of user input on trained network</h2>
 					<p>
 					Below the network can be tried out by drawing a digit inside the box and pressing the recognize button.
