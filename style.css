@@ -1,5 +1,4 @@
 html {
-overflow-x: hidden;
 font-family: 'Hind';
 }
 
@@ -12,7 +11,6 @@ background-size: cover;
 background-position: center;
 background-repeat: no-repeat;
 background-attachment: fixed;
-overflow-x: hidden; 
 }
 
 .container {
@@ -35,10 +33,11 @@ border-radius: 10px;
 display: block;
 float: left;
 margin-bottom: 20px;
+overflow: auto;
 }
 
 .box pre{
-overflow-x: auto;
+
 }
 
 .katex-display {
@@ -52,8 +51,8 @@ width: 100%;
 }
 
 table tr {
-word-wrap: break-word;         /* All browsers since IE 5.5+ */
-overflow-wrap: break-word;     /* Renamed property in CSS3 draft spec */
+word-wrap: break-word;
+overflow-wrap: break-word;
 }
 
 .subbox{
@@ -121,7 +120,6 @@ canvas {
 display: block;
 margin: 0 auto;
 outline: 1px solid #000000;
-overflow-x: auto;
 }
 
 .center {

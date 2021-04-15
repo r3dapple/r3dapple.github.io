@@ -8,6 +8,11 @@
 * AGREEMENTS
 */
 
+/*
+optimization:
+- use gl.drawElements instead of gl.drawArrays and draw each cube using 8 instead of 36 verticies (4.5 times less!)
+- remove texture and add single color for entire cube 
+*/
 cellularautomata3d();
 function cellularautomata3d(){
 
@@ -209,11 +214,14 @@ function cellularautomata3d(){
 			fscanvas.width = newwidth;
 		}, 200);
 	});
-	var gl = fscanvas.getContext("webgl", {antialias: true});
+	var gl = fscanvas.getContext("webgl"/*, {antialias: true}*/);
 	const r3webgl = {...parentr3webgl};
 	r3webgl.gl = gl;
+	/*
+	Anti Aliasing intensity setting
 	gl.enable(gl.SAMPLE_COVERAGE);
 	gl.sampleCoverage(0.5, false);
+	*/
 
 	$("#webglstudytoggle").click(toggle);
 	function toggle(){running ? (running = false, $("#webglstudytoggle").html("Start")) : (running = true, $("#webglstudytoggle").html("Stop"));}
@@ -379,7 +387,7 @@ function cellularautomata3d(){
 					for(var z = 0; z < cellularworldsize; z++){
 						if(cellgrid[x][y][z] == 1){
 							gl.uniformMatrix4fv(uniformLocations.modelmatrix, false, r3webgl.createModelMatrix(x, y, z, 0, 0, 0, 0.5, 0.5, 0.5));
-							gl.drawArrays(gl.TRIANGLES, 0, 6*2*3 /*this has a lot less*/);
+							gl.drawArrays(gl.TRIANGLES, 0, 6*2*3);
 						}
 					}
 				}

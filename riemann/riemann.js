@@ -6,6 +6,7 @@
 * CREATIVE COMMONS ATTRIBUTION-NONCOMMERCIAL 4.0 INTERNATIONAL LICENSE
 * AGREEMENTS
 */
+
 // --- COMPLEX NUMBERS ---
 class Complex{
 	constructor(real, imaginary){
