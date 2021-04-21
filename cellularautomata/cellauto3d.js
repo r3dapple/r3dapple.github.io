@@ -1,7 +1,6 @@
 /*
-* Copyright 2021 Markus Heimerl, OTH Regensburg, r3dapple.de
+* Copyright 2021 Markus Heimerl, OTH Regensburg
 * Licensed under CC BY-NC 4.0
-* r3dapple.de/LICENSE.txt
 *
 * ANY USE OF THIS SOFTWARE MUST COMPLY WITH THE
 * CREATIVE COMMONS ATTRIBUTION-NONCOMMERCIAL 4.0 INTERNATIONAL LICENSE
@@ -10,20 +9,23 @@
 
 /*
 optimization:
-- use gl.drawElements instead of gl.drawArrays and draw each cube using 8 instead of 36 verticies (4.5 times less!)
-- remove texture and add single color for entire cube 
+- use gl.drawElements instead of gl.drawArrays and draw each cube using 8 instead of 36 verticies (4.5 times less!) - done. Made things a little faster, not as much as i hope tho
 */
 cellularautomata3d();
 function cellularautomata3d(){
 
+	var z_crunchfactor = 1;
+	var cellularworldsize = 60;
+	var rulefactor = 2;
+	
 	function createCellGridWireframe(cellularworldsize, randomize){
 		var cellgrid = [];
 		for(var x = 0; x < cellularworldsize; x++){
 			cellgrid[x] = [];
 			for(var y = 0; y < cellularworldsize; y++){
 				cellgrid[x][y] = [];
-				for(var z = 0; z < cellularworldsize; z++){
-					if(randomize)cellgrid[x][y][z] = Math.random() >= 0.5 ? 1 : 0;
+				for(var z = 0; z < cellularworldsize/z_crunchfactor; z++){
+					if(randomize && z < cellularworldsize/3 && y < cellularworldsize/3 && x < cellularworldsize/3) cellgrid[x][y][z] = Math.random() >= 0.5 ? 1 : 0;
 					else cellgrid[x][y][z] = 0;
 					
 					// mark world edges
@@ -31,16 +33,16 @@ function cellularautomata3d(){
 					if(x == 0 && z == 0) cellgrid[x][y][z] = 1;
 					if(x == 0 && y == 0) cellgrid[x][y][z] = 1;
 					
-					if(y == cellularworldsize-1 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
-					if(x == cellularworldsize-1 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					if(y == cellularworldsize-1 && z == cellularworldsize/z_crunchfactor-1) cellgrid[x][y][z] = 1;
+					if(x == cellularworldsize-1 && z == cellularworldsize/z_crunchfactor-1) cellgrid[x][y][z] = 1;
 					if(x == cellularworldsize-1 && y == cellularworldsize-1) cellgrid[x][y][z] = 1;
 					
 					if(y == cellularworldsize-1 && z == 0) cellgrid[x][y][z] = 1;
 					if(x == cellularworldsize-1 && z == 0) cellgrid[x][y][z] = 1;
 					if(x == cellularworldsize-1 && y == 0) cellgrid[x][y][z] = 1;
 					
-					if(y == 0 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
-					if(x == 0 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					if(y == 0 && z == cellularworldsize/z_crunchfactor-1) cellgrid[x][y][z] = 1;
+					if(x == 0 && z == cellularworldsize/z_crunchfactor-1) cellgrid[x][y][z] = 1;
 					if(x == 0 && y == cellularworldsize-1) cellgrid[x][y][z] = 1;
 				}
 			}
@@ -48,9 +50,7 @@ function cellularautomata3d(){
 		return cellgrid;
 	}
 
-	var cellularworldsize = 60;
 	var cellgrid = createCellGridWireframe(cellularworldsize, true);
-	var rulefactor = 2;
 
 	cellularAutomataLogic();
 	function cellularAutomataLogic(){
@@ -111,7 +111,6 @@ function cellularautomata3d(){
 		var allTexCoords = [];
 		var allNormals = [];
 
-
 		var objects = {};
 		var objname = "";
 
@@ -169,40 +168,28 @@ function cellularautomata3d(){
 		precision highp float;
 
 		attribute vec4 vertexposition;
-		attribute vec2 texturecoordinate;
-		attribute vec3 normal;
+		attribute vec4 color;
 
 		uniform mat4 modelmatrix;
 		uniform mat4 projectionmatrix;
 		uniform mat4 viewmatrix;
 
-		varying vec2 o_texturecoordinate;
-		varying vec3 o_normal;
+		varying vec4 o_color;
 
 		void main(){
-			o_texturecoordinate = texturecoordinate;
-			o_normal = mat3(modelmatrix) * normal;
+			o_color = color;
 			gl_Position = projectionmatrix * viewmatrix * modelmatrix * vertexposition;
 		}
 	`;
 
 	const fragmentshadersource = `
 		precision highp float;
-
-		varying vec2 o_texturecoordinate;
-		varying vec3 o_normal;
-
-		uniform sampler2D texture;
-		uniform vec3 reverseLightDirection;
-
+		varying vec4 o_color;
 		void main(){
-			vec3 normal = normalize(o_normal);
-			float light = dot(normal, reverseLightDirection);
-
-			gl_FragColor = texture2D(texture, o_texturecoordinate);
-			//gl_FragColor.rgb *= light;
+			gl_FragColor = o_color;
 		}
 	`;
+	
 	// --- GET CANVAS CONTEXT AND SETUP KEY LISTENERS ---
 	var running = true;
 
@@ -262,58 +249,51 @@ function cellularautomata3d(){
 	gl.useProgram(program);
 
 	// --- GET ALL ATTRIBUTE AND UNIFORM LOCATIONS
-	const attribLocations = r3webgl.getAttribLocations(program, ["vertexposition", "texturecoordinate", "normal"]);
-	const uniformLocations = r3webgl.getUniformLocations(program, ["modelmatrix", "viewmatrix", "projectionmatrix", "texture", "reverseLightDirection"]);
+	const attribLocations = r3webgl.getAttribLocations(program, ["vertexposition", "color"]);
+	const uniformLocations = r3webgl.getUniformLocations(program, ["modelmatrix", "viewmatrix", "projectionmatrix"]);
 
 	// --- INIT 3D ---
 	r3webgl.init3D();
 
-	// --- MAKE BUFFER WITH POSITION DATA FOR LETTER F --- 
-	var vertexbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, vertex_data.positions);
+	// --- MAKE BUFFER WITH POSITION DATA ---
+	var positions = [
+		-1.0, -1.0, -1.0, 
+		1.0, -1.0, -1.0,
+		1.0, 1.0, -1.0, 
+		-1.0, 1.0, -1.0,
+		-1.0, -1.0, 1.0, 
+		1.0, -1.0, 1.0,
+		1.0, 1.0, 1.0, 
+		-1.0, 1.0, 1.0
+	];
+	var vertexbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, positions);
 
-	// --- NORMAL COORDINATES FOR EACH VERTEX ---
-	var normalbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, vertex_data.normals);
+	// --- MAKE VERTEX INDICES ---
+	var indices = [
+		5, 4, 0, 1, 5, 0, 6, 5, 1, 2, 6, 1,
+		7, 6, 2, 3, 7, 2, 4, 7, 3, 0, 4, 3,
+		6, 7, 4, 5, 6, 4, 1, 0, 3, 2, 1, 3
+	];
+
+	var indicesbuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesbuffer);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  
+	// --- GET COLOR DATA ---
+	var colors = [
+		0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
+		1.0, 0.5, 0.0, 1.0, 1.0, 0.5, 0.0, 1.0,
+		1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+		0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0
+	];
+
+	const colorsbuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, colorsbuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
 
-	// --- MAKE TEXTURE COORDINATE DATA ---
-	for(var i = 0; i < vertex_data.texcoords.length; i++){
-		// convert to texture clip space. Texture width and height is 256
-		vertex_data.texcoords[i] = vertex_data.texcoords[i] / 256;
-	}
-	var texcoordbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, vertex_data.texcoords);
-
-
-	// --- CREATE TEXTURE AND GET RESOURCE ---
-	var texture = r3webgl.createTexture();
-	r3webgl.attachTextureSourceAsync(texture, "webgl3dstudy/f-texture.png", false);
-
-	// --- THERE SHALL BE LIGHT ---
-	gl.uniform3fv(uniformLocations.reverseLightDirection, m4.normalize([1.0, 0.0, 0.0, 1.0]));
-
-	// GET DATA FROM OBJ
-	var cubevertexbuffer;
-	var cubetexcoordbuffer;
-	var cubenormalbuffer;
-	main();
-	async function main() {
-		const response = await fetch('webgl3dstudy/cube.obj');
-		const text = await response.text();
-		var data = parseOBJ(text, true);
-		console.log(data);
-		cubevertexbuffer  = r3webgl.createBuffer(gl.ARRAY_BUFFER, data["Cube"].positions);
-		cubetexcoordbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, data["Cube"].texcoords);
-		cubenormalbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, data["Cube"].normals);
-	}
-	// --- GET OBJ TEXTURE ---
-	var texturecube = r3webgl.createTexture();
-	r3webgl.attachTextureSourceAsync(texturecube, "webgl3dstudy/cubetexturetest.png", true);
-
-	// --- ENABLE TEXTURE0 ---
-	gl.uniform1i(uniformLocations.texture, 0);
-
-	var angle = 0.0;
-	var rotationspeed = 15.2;
-	var camerapos = [0.0, 0.0, 0.0];
+	// --- SETUP CAMERA ---
+	var camerapos = [30.0, 30.0, -100.0];
 
 	requestAnimationFrame(drawScene);
 	toggle();
@@ -330,8 +310,6 @@ function cellularautomata3d(){
 			var deltaTime = now - then;
 			// remember the current time for the next frame
 			then = now;
-
-			angle += rotationspeed * deltaTime;
 
 			// --- SETUP PROJECTION MATRIX --- (MAKE EVERYTHING 3D)
 			//var projectionmatrix = m4.createOrthographicMatrix(0, gl.canvas.clientWidth, gl.canvas.clientHeight, 0, 400, -400);
@@ -375,19 +353,17 @@ function cellularautomata3d(){
 
 
 			// --- CONNECT BUFFERS TO ATTRIBUTES --- (only has to be done once since the only object vertex data we ever need is that of a cube)
-			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubevertexbuffer, attribLocations.vertexposition, 3, true);
-			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubenormalbuffer, attribLocations.normal, 3, true);
-			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubetexcoordbuffer, attribLocations.texturecoordinate, 2, true);
+			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, vertexbuffer, attribLocations.vertexposition, 3, true);
+			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, colorsbuffer, attribLocations.color, 4, true);
 			
 			
 			// -- DRAW ---
-			gl.bindTexture(gl.TEXTURE_2D, texturecube);
 			for(var x = 0; x < cellularworldsize; x++){
 				for(var y = 0; y < cellularworldsize; y++){
 					for(var z = 0; z < cellularworldsize; z++){
 						if(cellgrid[x][y][z] == 1){
 							gl.uniformMatrix4fv(uniformLocations.modelmatrix, false, r3webgl.createModelMatrix(x, y, z, 0, 0, 0, 0.5, 0.5, 0.5));
-							gl.drawArrays(gl.TRIANGLES, 0, 6*2*3);
+							gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 						}
 					}
 				}
