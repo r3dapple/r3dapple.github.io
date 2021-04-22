@@ -1,7 +1,6 @@
 /*
-* Copyright 2021 Markus Heimerl, OTH Regensburg, r3dapple.de
+* Copyright 2021 Markus Heimerl, OTH Regensburg
 * Licensed under CC BY-NC 4.0
-* r3dapple.de/LICENSE.txt
 *
 * ANY USE OF THIS SOFTWARE MUST COMPLY WITH THE
 * CREATIVE COMMONS ATTRIBUTION-NONCOMMERCIAL 4.0 INTERNATIONAL LICENSE
@@ -265,6 +264,9 @@ function cellularautomata3d(){
 	
 	$("#cellauto3dapply").click(apply);
 	function apply(){survivevalues = parseRulestring3D($("#cellRuleInput3D").val())[1]; bornvalues = parseRulestring3D($("#cellRuleInput3D").val())[0];}
+	
+	$("#cellauto3drandomize").click(randomize);
+	function randomize(){cellgrid = createCellGridWireframe(cellularworldsize, true);}
 	
 	// https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
 	fscanvas.onclick = function(){

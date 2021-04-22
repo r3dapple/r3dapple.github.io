@@ -31,7 +31,7 @@
 					<a href="https://en.wikipedia.org/wiki/Life-like_cellular_automaton">Wikipedia</a> | 
 					<a href="https://www.conwaylife.com/wiki/List_of_Life-like_cellular_automata">Examples for rules</a> | 
 					<a href="https://www.reddit.com/r/cellular_automata/comments/llkp5e/ive_recently_developed_some_new_techniques_for/">Cellular Automata Subreddit Multidimensionality</a>
-					<div class="row"><small>Last changed: 13.03.2021</small></div>
+					<div class="row"><small>Last changed: 22.04.2021</small></div>
 					<hr class="solid">
 					<p>
 						Let's start with the most famous cellular automation: the life-likes. Life-like cellular automaton are simulations with a distinct rulesets, 
@@ -110,8 +110,8 @@
 						Try out rulestrings: <input title="cellRuleInputMulti" id="cellRuleInputMulti" type="text" value="B18,22,19/S23,43,49"></input> 
 						And set the radius: <input title="cellRuleInputMultiRadius" id="cellRuleInputMultiRadius" type="number" value="7"></input>
 						<button id="cellToggleButtonApply">Apply</button>
-						<button id="cellToggleButtonMulti">Stop</button>
 						<button id="cellRandButtonMulti">Randomize</button>
+						<button id="cellToggleButtonMulti">Stop</button>
 					</p>
 
 					<canvas id="cellularautomatoncanvasmultineighbor" width="1024" height="512" role="img" aria-label="cellularautomatoncanvasmultineighbor"></canvas>
@@ -119,14 +119,16 @@
 					<h2>Spicing things up with an extra dimension</h2>
 					
 					<p>
-					The ruleset can also be applied to surrounding cubes in three dimensions. Here more complex structures can emerge. In this example the ruleset is B4/S20,24.<br>
-					You can explore this demo by clicking inside the canvas. Look around with your mouse, use W,S,A and D for surface movement, E to go up and Q to go down. 
 					The app was writting in <a href="cellauto3d.js">javascript</a> and the help of my <a href="/lib/r3webgl.js">3D library</a>.
+					The ruleset can also be applied to surrounding cubes in three dimensions. Here more complex structures can emerge. The top inner surface is connected to the bottom surface.
+					The same is true for all other sides. The cube is interconnected with itself. (Email me if you know how to express this correctly).
+					You can explore this demo by clicking inside the canvas.<br> Look around with your mouse, use W,S,A and D for surface movement, E to go up and Q to go down. 
 					</p>
 					
 					<p>
 						Try out rulestrings: <input title="cellRuleInput3D" id="cellRuleInput3D" type="text" value="B4/S20,24"></input> 
 						<button id="cellauto3dapply">Apply</button>
+						<button id="cellauto3drandomize">Randomize</button>
 						<button id="cellauto3dtoggle">Stop</button>
 					</p>
 					
@@ -135,7 +137,6 @@
 					<script src="/lib/r3webgl.js"></script>
 					<script src="cellularautomata.js"></script>
 					<script src="cellularautomatamulti.js"></script>
-					<script src="vertex_data.js"></script>
 					<script src="cellauto3d.js"></script>
 				</div>
 			</div>
