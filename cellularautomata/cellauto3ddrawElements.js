@@ -1,7 +1,6 @@
 /*
-* Copyright 2021 Markus Heimerl, OTH Regensburg, r3dapple.de
+* Copyright 2021 Markus Heimerl, OTH Regensburg
 * Licensed under CC BY-NC 4.0
-* r3dapple.de/LICENSE.txt
 *
 * ANY USE OF THIS SOFTWARE MUST COMPLY WITH THE
 * CREATIVE COMMONS ATTRIBUTION-NONCOMMERCIAL 4.0 INTERNATIONAL LICENSE
@@ -9,56 +8,25 @@
 */
 
 /*
-optimization:
-- use gl.drawElements instead of gl.drawArrays and draw each cube using 8 instead of 36 verticies (4.5 times less!) - tried it. Its not faster at all and I dont know why. Can be found under /cellularautomata/cellauto3ddrawElements.js
+This draws the cube using only 8 verticies. Is not faster than the version where cubes are drawn with 36 verticies. No idea why.
+If you know email me please at: markus (AT) markusheimerl (DOT) com
 */
 
 cellularautomata3d();
 function cellularautomata3d(){
 
-	function parseRulestring3D(rulestring){
-		var res = rulestring.split("/");
-		res[0] = res[0].substring(1);
-		res[1] = res[1].substring(1);
-
-		var bornValues = [];
-		if(res[0] == ""){
-			bornValues[0] = -9999;
-		}else{
-			var commasplit = res[0].split(",");
-			for(var i = 0; i < commasplit.length; i++){
-				bornValues[i] = parseInt(commasplit[i]);
-			}
-		}
-
-		var surviveValues = [];
-		if(res[1] == ""){
-			surviveValues[1] = -9999;
-		}else{
-			var commasplit = res[1].split(",");
-			for(var i = 0; i < commasplit.length; i++){
-				surviveValues[i] = parseInt(commasplit[i]);
-			}
-		}
-
-		return [bornValues, surviveValues];
-	}
-
-	function checkRuleConditions(neighborcount, values){
-		for(var i = 0; i < values.length; i++){
-			if(neighborcount == values[i]) return true;
-		}
-		return false;
-	}
-
+	var z_crunchfactor = 1;
+	var cellularworldsize = 70;
+	var rulefactor = 2;
+	
 	function createCellGridWireframe(cellularworldsize, randomize){
 		var cellgrid = [];
 		for(var x = 0; x < cellularworldsize; x++){
 			cellgrid[x] = [];
 			for(var y = 0; y < cellularworldsize; y++){
 				cellgrid[x][y] = [];
-				for(var z = 0; z < cellularworldsize; z++){
-					if(randomize)cellgrid[x][y][z] = Math.random() >= 0.5 ? 1 : 0;
+				for(var z = 0; z < cellularworldsize/z_crunchfactor; z++){
+					if(randomize && z < cellularworldsize/3 && y < cellularworldsize/3 && x < cellularworldsize/3) cellgrid[x][y][z] = Math.random() >= 0.5 ? 1 : 0;
 					else cellgrid[x][y][z] = 0;
 					
 					// mark world edges
@@ -66,16 +34,16 @@ function cellularautomata3d(){
 					if(x == 0 && z == 0) cellgrid[x][y][z] = 1;
 					if(x == 0 && y == 0) cellgrid[x][y][z] = 1;
 					
-					if(y == cellularworldsize-1 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
-					if(x == cellularworldsize-1 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					if(y == cellularworldsize-1 && z == cellularworldsize/z_crunchfactor-1) cellgrid[x][y][z] = 1;
+					if(x == cellularworldsize-1 && z == cellularworldsize/z_crunchfactor-1) cellgrid[x][y][z] = 1;
 					if(x == cellularworldsize-1 && y == cellularworldsize-1) cellgrid[x][y][z] = 1;
 					
 					if(y == cellularworldsize-1 && z == 0) cellgrid[x][y][z] = 1;
 					if(x == cellularworldsize-1 && z == 0) cellgrid[x][y][z] = 1;
 					if(x == cellularworldsize-1 && y == 0) cellgrid[x][y][z] = 1;
 					
-					if(y == 0 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
-					if(x == 0 && z == cellularworldsize-1) cellgrid[x][y][z] = 1;
+					if(y == 0 && z == cellularworldsize/z_crunchfactor-1) cellgrid[x][y][z] = 1;
+					if(x == 0 && z == cellularworldsize/z_crunchfactor-1) cellgrid[x][y][z] = 1;
 					if(x == 0 && y == cellularworldsize-1) cellgrid[x][y][z] = 1;
 				}
 			}
@@ -83,10 +51,7 @@ function cellularautomata3d(){
 		return cellgrid;
 	}
 
-	var cellularworldsize = 60;
 	var cellgrid = createCellGridWireframe(cellularworldsize, true);
-	var survivevalues = parseRulestring3D($("#cellRuleInput3D").val())[1];
-	var bornvalues = parseRulestring3D($("#cellRuleInput3D").val())[0];
 
 	cellularAutomataLogic();
 	function cellularAutomataLogic(){
@@ -120,12 +85,12 @@ function cellularautomata3d(){
 						neighborcount += cellgrid[x][y][zp1] + cellgrid[x][yp1][zp1] + cellgrid[x][ym1][zp1] + cellgrid[xp1][y][zp1] 
 											+ cellgrid[xm1][y][zp1] + cellgrid[xp1][yp1][zp1] + cellgrid[xp1][ym1][zp1] + cellgrid[xm1][ym1][zp1] + cellgrid[xm1][yp1][zp1];
 											
-						// if cell alive and neighborcount 2,3 or 8, it stays alive
-						if(status == 1 && checkRuleConditions(neighborcount, survivevalues)){
+						// if cell alive and neiborcount 2,3 or 8, it stays alive
+						if(status == 1 && (/*neighborcount == 2*rulefactor ||*/ neighborcount == 26 || neighborcount == 10*rulefactor)){
 							cellgridnextframe[x][y][z] = 1;
 						}
 						// if cell is dead and neighborcount is 3, it is born
-						else if(status == 0 && checkRuleConditions(neighborcount, bornvalues)){
+						else if(status == 0 && (/*neighborcount == 5 ||*/ neighborcount == 4)){
 							cellgridnextframe[x][y][z] = 1;
 						}
 						// in all other cases the cell remains dead or dies (already initialized as 0)
@@ -141,108 +106,36 @@ function cellularautomata3d(){
 
 
 	// --- DRAWING CODE ---
-	function parseOBJ(data){
-
-		var allVerticies = [];
-		var allTexCoords = [];
-		var allNormals = [];
-
-
-		var objects = {};
-		var objname = "";
-
-		var individualLines = data.split('\n');
-		
-		for(var i = 0; i < individualLines.length; i++){
-			var lineElements = individualLines[i].split(' ');
-			var type = lineElements[0];
-			switch(type){
-				case "#":
-					break;
-				case " ":
-					break;
-				case "o":
-					objname = lineElements[1];
-					objects[objname] = {};
-					objects[objname].positions = [];
-					objects[objname].texcoords = [];
-					objects[objname].normals = [];
-					break;
-				case "v":
-					allVerticies.push([lineElements[1], lineElements[2], lineElements[3]].map(parseFloat));
-					break;
-				case "vt":
-					allTexCoords.push([lineElements[1], lineElements[2]].map(parseFloat));
-					break;
-				case "vn":
-					allNormals.push([lineElements[1], lineElements[2], lineElements[3]].map(parseFloat));
-					break;
-				case "f":
-					var faceParts = [];
-					for(var j = 0; j < lineElements.length - 1; j++){ 
-						faceParts[j] = lineElements[j+1].split('/').map(str => parseInt(str)-1);
-					}
-					objects[objname].positions.push(allVerticies[faceParts[0][0]], allVerticies[faceParts[1][0]], allVerticies[faceParts[2][0]]);
-					objects[objname].texcoords.push(allTexCoords[faceParts[0][1]], allTexCoords[faceParts[1][1]], allTexCoords[faceParts[2][1]]);
-					objects[objname].normals.push(allNormals[faceParts[0][2]], allNormals[faceParts[1][2]], allNormals[faceParts[2][2]]);
-					break;
-				default:
-					//console.warn("objloader: unhandled keyword: ", type);
-			}
-		}
-
-		for(var obj in objects){
-			objects[obj].positions = objects[obj].positions.flat();
-			objects[obj].texcoords = objects[obj].texcoords.flat();
-			objects[obj].normals = objects[obj].normals.flat();
-		}
-
-		return objects;
-	}
-
-
 	const vertexshadersource = `
-		precision highp float;
+		precision lowp float;
 
 		attribute vec4 vertexposition;
-		attribute vec2 texturecoordinate;
-		attribute vec3 normal;
+		attribute vec4 color;
 
 		uniform mat4 modelmatrix;
 		uniform mat4 projectionmatrix;
 		uniform mat4 viewmatrix;
 
-		varying vec2 o_texturecoordinate;
-		varying vec3 o_normal;
+		varying vec4 o_color;
 
 		void main(){
-			o_texturecoordinate = texturecoordinate;
-			o_normal = mat3(modelmatrix) * normal;
+			o_color = color;
 			gl_Position = projectionmatrix * viewmatrix * modelmatrix * vertexposition;
 		}
 	`;
 
 	const fragmentshadersource = `
-		precision highp float;
-
-		varying vec2 o_texturecoordinate;
-		varying vec3 o_normal;
-
-		uniform sampler2D texture;
-		uniform vec3 reverseLightDirection;
-
+		precision lowp float;
+		varying vec4 o_color;
 		void main(){
-			vec3 normal = normalize(o_normal);
-			float light = dot(normal, reverseLightDirection);
-
-			gl_FragColor = texture2D(texture, o_texturecoordinate);
-			//gl_FragColor.rgb *= light;
+			gl_FragColor = o_color;
 		}
 	`;
+	
 	// --- GET CANVAS CONTEXT AND SETUP KEY LISTENERS ---
 	var running = true;
 
-	var fscanvas = $("#cellauto3dcanvas")[0];
+	var fscanvas = $("#webglstudycanvas")[0];
 	fscanvas.width = Math.pow(2, Math.floor(getBaseLog(2, $(window).width() * 0.88)));
 	window.addEventListener("orientationchange", function() {
 		setTimeout(function(){
@@ -250,23 +143,15 @@ function cellularautomata3d(){
 			fscanvas.width = newwidth;
 		}, 200);
 	});
-	var gl = fscanvas.getContext("webgl"/*, {antialias: true}*/);
+	var gl = fscanvas.getContext("webgl");
 	const r3webgl = {...parentr3webgl};
 	r3webgl.gl = gl;
-	/*
-	Anti Aliasing intensity setting
-	gl.enable(gl.SAMPLE_COVERAGE);
-	gl.sampleCoverage(0.5, false);
-	*/
+
+	$("#webglstudytoggle").click(toggle);
+	function toggle(){running ? (running = false, $("#webglstudytoggle").html("Start")) : (running = true, $("#webglstudytoggle").html("Stop"));}
+	// https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
 
 	// --- ADD EVENT LISTENERS ---
-	$("#cellauto3dtoggle").click(toggle);
-	function toggle(){running ? (running = false, $("#cellauto3dtoggle").html("Start")) : (running = true, $("#cellauto3dtoggle").html("Stop"));}
-	
-	$("#cellauto3dapply").click(apply);
-	function apply(){survivevalues = parseRulestring3D($("#cellRuleInput3D").val())[1]; bornvalues = parseRulestring3D($("#cellRuleInput3D").val())[0];}
-	
-	// https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
 	fscanvas.onclick = function(){
 		fscanvas.requestPointerLock();
 	}
@@ -288,10 +173,10 @@ function cellularautomata3d(){
 	}
 
 	var keys = {};
-	$("#cellauto3dcanvas").keydown(function(event) {
+	$("#webglstudycanvas").keydown(function(event) {
 			keys[event.key] = true;
 	});
-	$("#cellauto3dcanvas").keyup(function(event) {
+	$("#webglstudycanvas").keyup(function(event) {
 			keys[event.key] = false;
 	});
 	// --- ---
@@ -301,37 +186,50 @@ function cellularautomata3d(){
 	gl.useProgram(program);
 
 	// --- GET ALL ATTRIBUTE AND UNIFORM LOCATIONS
-	const attribLocations = r3webgl.getAttribLocations(program, ["vertexposition", "texturecoordinate", "normal"]);
-	const uniformLocations = r3webgl.getUniformLocations(program, ["modelmatrix", "viewmatrix", "projectionmatrix", "texture", "reverseLightDirection"]);
+	const attribLocations = r3webgl.getAttribLocations(program, ["vertexposition", "color"]);
+	const uniformLocations = r3webgl.getUniformLocations(program, ["modelmatrix", "viewmatrix", "projectionmatrix"]);
 
 	// --- INIT 3D ---
 	r3webgl.init3D();
 
-	// --- THERE SHALL BE LIGHT ---
-	gl.uniform3fv(uniformLocations.reverseLightDirection, m4.normalize([1.0, 0.0, 0.0, 1.0]));
+	// --- MAKE BUFFER WITH POSITION DATA ---
+	var positions = [
+		-1.0, -1.0, -1.0, 
+		1.0, -1.0, -1.0,
+		1.0, 1.0, -1.0, 
+		-1.0, 1.0, -1.0,
+		-1.0, -1.0, 1.0, 
+		1.0, -1.0, 1.0,
+		1.0, 1.0, 1.0, 
+		-1.0, 1.0, 1.0
+	];
+	var vertexbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, positions);
 
-	// GET DATA FROM OBJ
-	var cubevertexbuffer;
-	var cubetexcoordbuffer;
-	var cubenormalbuffer;
-	main();
-	async function main() {
-		const response = await fetch('webgl3dstudy/cube.obj');
-		const text = await response.text();
-		var data = parseOBJ(text, true);
-		console.log(data);
-		cubevertexbuffer  = r3webgl.createBuffer(gl.ARRAY_BUFFER, data["Cube"].positions);
-		cubetexcoordbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, data["Cube"].texcoords);
-		cubenormalbuffer = r3webgl.createBuffer(gl.ARRAY_BUFFER, data["Cube"].normals);
-	}
-	
-	// --- GET OBJ TEXTURE ---
-	var texturecube = r3webgl.createTexture();
-	r3webgl.attachTextureSourceAsync(texturecube, "webgl3dstudy/cubetexturetest.png", true);
+	// --- MAKE VERTEX INDICES ---
+	var indices = [
+		5, 4, 0, 1, 5, 0, 6, 5, 1, 2, 6, 1,
+		7, 6, 2, 3, 7, 2, 4, 7, 3, 0, 4, 3,
+		6, 7, 4, 5, 6, 4, 1, 0, 3, 2, 1, 3
+	];
 
-	// --- ENABLE TEXTURE0 ---
-	gl.uniform1i(uniformLocations.texture, 0);
+	var indicesbuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesbuffer);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+  
+	// --- GET COLOR DATA ---
+	var colors = [
+		0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
+		1.0, 0.5, 0.0, 1.0, 1.0, 0.5, 0.0, 1.0,
+		1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+		0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0
+	];
 
+	const colorsbuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, colorsbuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+
+	// --- SETUP CAMERA ---
 	var camerapos = [30.0, 30.0, -100.0];
 
 	requestAnimationFrame(drawScene);
@@ -351,7 +249,6 @@ function cellularautomata3d(){
 			then = now;
 
 			// --- SETUP PROJECTION MATRIX --- (MAKE EVERYTHING 3D)
-			//var projectionmatrix = m4.createOrthographicMatrix(0, gl.canvas.clientWidth, gl.canvas.clientHeight, 0, 400, -400);
 			var projectionmatrix = m4.createPerspectiveMatrix(m4.degreeToRadians(46.0), gl.canvas.clientWidth/gl.canvas.clientHeight, 1, 200000);
 			gl.uniformMatrix4fv(uniformLocations.projectionmatrix, false, projectionmatrix);
 
@@ -392,24 +289,23 @@ function cellularautomata3d(){
 
 
 			// --- CONNECT BUFFERS TO ATTRIBUTES --- (only has to be done once since the only object vertex data we ever need is that of a cube)
-			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubevertexbuffer, attribLocations.vertexposition, 3, true);
-			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubenormalbuffer, attribLocations.normal, 3, true);
-			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, cubetexcoordbuffer, attribLocations.texturecoordinate, 2, true);
+			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, vertexbuffer, attribLocations.vertexposition, 3, true);
+			r3webgl.connectBufferToAttribute(gl.ARRAY_BUFFER, colorsbuffer, attribLocations.color, 4, true);
 			
 			
 			// -- DRAW ---
-			//console.time("drawloop");
+			console.time("drawloop");
 			for(var x = 0; x < cellularworldsize; x++){
 				for(var y = 0; y < cellularworldsize; y++){
 					for(var z = 0; z < cellularworldsize; z++){
 						if(cellgrid[x][y][z] == 1){
 							gl.uniformMatrix4fv(uniformLocations.modelmatrix, false, r3webgl.createModelMatrix(x, y, z, 0, 0, 0, 0.5, 0.5, 0.5));
-							gl.drawArrays(gl.TRIANGLES, 0, 6*2*3);
+							gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 						}
 					}
 				}
 			}
-			//console.timeEnd("drawloop");
+			console.timeEnd("drawloop");
 
 		}
 		requestAnimationFrame(drawScene);

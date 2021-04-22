@@ -35,12 +35,12 @@
 					<hr class="solid">
 					<p>
 						Let's start with the most famous cellular automation: the life-likes. Life-like cellular automaton are simulations with a distinct rulesets, 
-						leaning on Conway's Game of Life. The one shown below is EightLife. There are basically two rules in each ruleset. How many neighbouring 
-						cells a dead cell needs to be born (B) and how many neighbouring cells an alive cell needs to survive (S), in the next iteration of the simulation. All other cells will stay dead or turn so.
+						leaning on Conway's Game of Life. The one shown below is EightLife. There are basically two rules in each ruleset. How many neighboring 
+						cells a dead cell needs to be born (B) and how many neighboring cells an alive cell needs to survive (S), in the next iteration of the simulation. All other cells will stay dead or turn so.
 					</p>
 
 					<p>
-						In Eightlife a dead cell needs three living neighbours to be born and an alive cell needs two, three, or eight to stay alive.
+						In Eightlife a dead cell needs three living neighbors to be born and an alive cell needs two, three, or eight to stay alive.
 						These are expressed in a rulestring: B3/S2,3,8
 					</p>
 
@@ -53,14 +53,8 @@
 					<canvas id="cellularautomatoncanvas" width="1024" height="512" role="img" aria-label="cellularautomatoncanvas"></canvas>
 
 					<p>
-						Things get more interesting when not just the direct neighbours influence a cells next state, but those two, three or more spaces away aswell.
-					</p>
-					<p>
-						Try out rulestrings: <input title="cellRuleInputMulti" id="cellRuleInputMulti" type="text" value="B18,22,19/S23,43,49"></input> 
-						And set the radius: <input title="cellRuleInputMultiRadius" id="cellRuleInputMultiRadius" type="number" value="7"></input>
-						<button id="cellToggleButtonApply">Apply</button>
-						<button id="cellToggleButtonMulti">Stop</button>
-						<button id="cellRandButtonMulti">Randomize</button>
+						Things get more interesting when not just the direct neighbors influence a cells next state, but those two, three or more spaces away aswell.
+						<a href="cellularautomatamulti.js">Implementation of the multi neighborhood cellular automata</a><br>
 					</p>
 					<p>
 
@@ -113,8 +107,13 @@
 						</tr>
 					</table>
 					<p>
-					<a href="cellularautomatamulti.js">GLSL implementation of multi neighbor CA</a><br>
+						Try out rulestrings: <input title="cellRuleInputMulti" id="cellRuleInputMulti" type="text" value="B18,22,19/S23,43,49"></input> 
+						And set the radius: <input title="cellRuleInputMultiRadius" id="cellRuleInputMultiRadius" type="number" value="7"></input>
+						<button id="cellToggleButtonApply">Apply</button>
+						<button id="cellToggleButtonMulti">Stop</button>
+						<button id="cellRandButtonMulti">Randomize</button>
 					</p>
+
 					<canvas id="cellularautomatoncanvasmultineighbor" width="1024" height="512" role="img" aria-label="cellularautomatoncanvasmultineighbor"></canvas>
 					
 					<h2>Spicing things up with an extra dimension</h2>
@@ -122,12 +121,17 @@
 					<p>
 					The ruleset can also be applied to surrounding cubes in three dimensions. Here more complex structures can emerge. In this example the ruleset is B4/S20,24.<br>
 					You can explore this demo by clicking inside the canvas. Look around with your mouse, use W,S,A and D for surface movement, E to go up and Q to go down. 
-					The app was writting in <a href="cellauto3d.js">javascript with the WebGL 1.0 API</a> with the help of my <a href="/lib/r3webgl.js">3D library</a>.
+					The app was writting in <a href="cellauto3d.js">javascript</a> and the help of my <a href="/lib/r3webgl.js">3D library</a>.
 					</p>
 					
-					<button id="webglstudytoggle">Stop</button>
+					<p>
+						Try out rulestrings: <input title="cellRuleInput3D" id="cellRuleInput3D" type="text" value="B4/S20,24"></input> 
+						<button id="cellauto3dapply">Apply</button>
+						<button id="cellauto3dtoggle">Stop</button>
+					</p>
+					
 					<!-- tabindex="1" needed for focus on object. So when I click on it, it focuses and the added eventListener for "keydown" triggers -->
-					<canvas tabindex="1" id="webglstudycanvas" width="1024" height="512" role="img" aria-label="webglstudycanvas"></canvas>
+					<canvas tabindex="1" id="cellauto3dcanvas" width="1024" height="512" role="img" aria-label="cellauto3dcanvas"></canvas>
 					<script src="/lib/r3webgl.js"></script>
 					<script src="cellularautomata.js"></script>
 					<script src="cellularautomatamulti.js"></script>

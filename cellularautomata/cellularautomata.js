@@ -18,7 +18,7 @@ function parseRulestring(rulestring){
 
 	var bornString = "";
 	if(res[0] == ""){
-		var bornString = "neighb == -9999";
+		bornString = "neighb == -9999";
 	}else{
 		var commasplit = res[0].split(",");
 		for(var i = 0; i < commasplit.length; i++){
@@ -29,7 +29,7 @@ function parseRulestring(rulestring){
 
 	var surviveString = "";
 	if(res[1] == ""){
-		var surviveString = "neighb == -9999";
+		surviveString = "neighb == -9999";
 	}else{
 		var commasplit = res[1].split(",");
 		for(var i = 0; i < commasplit.length; i++){
