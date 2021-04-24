@@ -104,18 +104,56 @@ function convertImageDataToArray(imagedata){
 	return arr;
 }
 
+function getMousePosition(e) {
+    var mouseX = e.offsetX * canvas.width / canvas.clientWidth | 0;
+    var mouseY = e.offsetY * canvas.height / canvas.clientHeight | 0;
+    return {x: mouseX, y: mouseY};
+}
+
 var mousedown = false;
+var touchevent = false;
 $("#multilayerperceptroncanvas").mousedown(function(e){mousedown = true;});
 $("#multilayerperceptroncanvas").mouseup(function(e){mousedown = false;});
 $("#multilayerperceptroncanvas").mousemove(function(e){
 	if(mousedown){
-		ctx.beginPath();
-		ctx.arc(e.offsetX, e.offsetY, 10, 0, 2 * Math.PI, false);
-		ctx.fill();
+		if(touchevent){
+			ctx.lineTo(getMousePosition(e).x, getMousePosition(e).y);
+			ctx.lineWidth = 10 * 2;
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.arc(getMousePosition(e).x, getMousePosition(e).y, 10, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.beginPath();
+			ctx.moveTo(getMousePosition(e).x, getMousePosition(e).y);
+			touchevent = false;
+		}else{
+			ctx.beginPath();
+			ctx.arc(e.offsetX, e.offsetY, 10, 0, 2 * Math.PI, false);
+			ctx.fill();
+		}
 	}
 });
 
+// --- TOUCHEVENTS FOR DRAWING CANVAS ---
+$("#multilayerperceptroncanvas")[0].addEventListener("touchstart", function (e) {
+  var touch = e.touches[0];
+  touchevent = true;
+  var mouseEvent = new MouseEvent("mousedown", {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  $("#multilayerperceptroncanvas")[0].dispatchEvent(mouseEvent);
+}, false);
 
+$("#multilayerperceptroncanvas")[0].addEventListener("touchend", function (e) {
+  var touch = e.touches[0];
+  var mouseEvent = new MouseEvent("mouseup", {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  $("#multilayerperceptroncanvas")[0].dispatchEvent(mouseEvent);
+}, false);
+// --- ---
 
 
 
@@ -287,6 +325,7 @@ DONE:
 */
 
 // --- FEED FORWARD VISUALISATION ---
+var loadingtext = "Loading...";
 initNeurons();
 function initNeurons(){
 	try {
@@ -294,12 +333,21 @@ function initNeurons(){
 		feedforwardvisualisation();
 	}
 	catch (e) {
+		loadingtext += ".";
+		$("#multilayerperceptronfeedforwardtopinfo")[0].getContext("2d").save();
+		$("#multilayerperceptronfeedforwardtopinfo")[0].getContext("2d").font = "20px Arial";
+		$("#multilayerperceptronfeedforwardtopinfo")[0].getContext("2d").fillText(loadingtext, 0, 30);
+		$("#multilayerperceptronfeedforwardtopinfo")[0].getContext("2d").restore();
+		
+		$("#multilayerperceptronfeedforward")[0].getContext("2d").save();
+		$("#multilayerperceptronfeedforward")[0].getContext("2d").font = "20px Arial";
+		$("#multilayerperceptronfeedforward")[0].getContext("2d").fillText(loadingtext, 0, 30);
+		$("#multilayerperceptronfeedforward")[0].getContext("2d").restore();
 		console.log(e);
 		setTimeout(initNeurons, 500);
 	}
 }
 
-//setTimeout(feedforwardvisualisation, 5);
 function feedforwardvisualisation(){
 	
 	// so the loop should just keep on drawing. And draw a certain neuron red. We specify with this variable here which one that is.
