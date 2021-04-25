@@ -334,15 +334,21 @@ function initNeurons(){
 	}
 	catch (e) {
 		loadingtext += ".";
-		$("#multilayerperceptronfeedforwardtopinfo")[0].getContext("2d").save();
-		$("#multilayerperceptronfeedforwardtopinfo")[0].getContext("2d").font = "20px Arial";
-		$("#multilayerperceptronfeedforwardtopinfo")[0].getContext("2d").fillText(loadingtext, 0, 30);
-		$("#multilayerperceptronfeedforwardtopinfo")[0].getContext("2d").restore();
+		var canvasfftopinfo = $("#multilayerperceptronfeedforwardtopinfo")[0];
+		var canvasmlpff = $("#multilayerperceptronfeedforward")[0];
 		
-		$("#multilayerperceptronfeedforward")[0].getContext("2d").save();
-		$("#multilayerperceptronfeedforward")[0].getContext("2d").font = "20px Arial";
-		$("#multilayerperceptronfeedforward")[0].getContext("2d").fillText(loadingtext, 0, 30);
-		$("#multilayerperceptronfeedforward")[0].getContext("2d").restore();
+		canvasfftopinfo.getContext("2d").clearRect(0, 0, canvasfftopinfo.width, canvasfftopinfo.height);
+		canvasfftopinfo.getContext("2d").save();
+		canvasfftopinfo.getContext("2d").font = "20px Arial";
+		canvasfftopinfo.getContext("2d").fillText(loadingtext, 0, 30);
+		canvasfftopinfo.getContext("2d").restore();
+		
+		canvasmlpff.getContext("2d").clearRect(0, 0, canvasmlpff.width, canvasmlpff.height);
+		canvasmlpff.getContext("2d").save();
+		canvasmlpff.getContext("2d").font = "20px Arial";
+		canvasmlpff.getContext("2d").fillText(loadingtext, 0, 30);
+		canvasmlpff.getContext("2d").restore();
+		
 		console.log(e);
 		setTimeout(initNeurons, 500);
 	}
