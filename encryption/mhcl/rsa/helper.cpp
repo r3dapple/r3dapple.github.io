@@ -1,21 +1,5 @@
 #include "helper.hh"
 
-BigInteger modpow(BigInteger base, BigInteger exp, BigInteger mod) {
-    base %= mod;
-	base = base % mod;
-    BigInteger result("1");
-    BigInteger one("1");
-
-    while (exp > 0) {
-        BigInteger h = exp;
-        h.bitAnd(h, one);
-        if (h != 0) result = (result * base) % mod;
-        base = (base * base) % mod;
-        exp.bitShiftRight(exp, 1);
-    }
-    return result;
-}
-
 bool fileExists(const char *name) {
     std::ifstream f(name);
     return f.good();

@@ -20,11 +20,13 @@ class BigInteger{
 		void divide(const BigInteger&);
 		void mod(const BigInteger&);
 		void pow(const BigInteger);
-		void modpow(const BigInteger&, const BigInteger&);
+		void modpow(BigInteger, const BigInteger&);
 		void bitAnd(const BigInteger&);
-		void bitOr(BigInteger);
-		void bitXOr(BigInteger);
-		void bitNot(BigInteger);
+		void bitOr(const BigInteger&);
+		void bitXOr(const BigInteger&);
+		void bitNot(const BigInteger&);
+		void bitShiftRight(int);
+		void bitShiftLeft(int);
 		bool operator <(const BigInteger&) const;
 		bool operator >(const BigInteger&) const;
 		bool operator ==(const BigInteger&) const;
@@ -50,7 +52,6 @@ class BigInteger{
 		void resize(int);
 		bool isNegative() const;
 		void setNegative(bool);
-		std::string getBinaryString() const;
 		std::string getNumber() const;
 		
 	private:
@@ -60,6 +61,8 @@ class BigInteger{
 		void subtract_digits(BigInteger);
 		char compare_digits(const BigInteger&) const;
 		BigInteger divide_digits(const BigInteger&, bool);
+		std::string getBinaryString() const;
+		void fromBinaryString(const std::string&);
 		void invertNumber();
 };
 

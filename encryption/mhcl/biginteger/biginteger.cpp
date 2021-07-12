@@ -132,25 +132,56 @@ void BigInteger::bitAnd(const BigInteger &operation_partner){
 	std::string res("");
 	res.resize(std::min(numb.size(), opb.size()), 0);
 	
-	for(int i = numb.size()-1; i >= 0; i--){
+	for(int i = res.size()-1; i >= 0; i--){
 		res[i] = numb[i] & opb[i];
 	}
-	//std::cout << res << std::endl;
-	
-	multiply(0);
-	for(int i = res.size()-1; i >= 0; i--){
-		BigInteger exp(i);
-		BigInteger multiplicant(BigInteger(2) ^ exp);
-		BigInteger summand(res[i]);
-		summand.multiply(multiplicant);
-		
-		add(summand);
-	}
-	int a = 5;
-	
+
+	fromBinaryString(res);
 }
 
-void BigInteger::modpow(const BigInteger &divisor, const BigInteger &exponent){}
+void BigInteger::bitShiftRight(int count){
+	
+	std::string numb = getBinaryString();
+	std::string res("");
+	int a = numb.size()-count;
+	res.resize(a > 0 ? a : 0);
+	
+	res = numb.substr(count, std::string::npos);
+	
+	fromBinaryString(res);
+}
+
+void BigInteger::bitShiftLeft(int count){
+	
+	std::string numb = getBinaryString();
+	std::string res("");
+	int a = numb.size()-count;
+	res.resize(a > 0 ? a : 0);
+	
+	res = numb.substr(0, numb.size()-1-count);
+	res.insert(0, count, 0);
+
+	fromBinaryString(res);
+}
+
+void BigInteger::modpow(BigInteger exp, const BigInteger &mod){
+	BigInteger base(*this);
+	base %= mod;
+	base = base % mod;
+	BigInteger result("1");
+	BigInteger one("1");
+	BigInteger zero("0");
+
+	while (exp > zero) {
+		BigInteger h(exp);
+		h.bitAnd(one);
+		if (h != zero) result = (result * base) % mod;
+		base = (base * base) % mod;
+		exp.bitShiftRight(1);
+	}
+	
+	(*this) = result;
+}
 
 bool BigInteger::operator <(const BigInteger &cmp) const {return compare(cmp) == -1;}
 bool BigInteger::operator >(const BigInteger &cmp) const {return compare(cmp) == 1;}
@@ -158,45 +189,45 @@ bool BigInteger::operator ==(const BigInteger &cmp) const {return compare(cmp) =
 bool BigInteger::operator !=(const BigInteger &cmp) const {return !((*this) == cmp);}
 bool BigInteger::operator <=(const BigInteger &cmp) const {char res = compare(cmp); return res == -1 || res == 0;}
 bool BigInteger::operator >=(const BigInteger &cmp) const {char res = compare(cmp); return res == 1 || res == 0;}
-BigInteger BigInteger::operator +(const BigInteger &cmp) const {
+BigInteger BigInteger::operator +(const BigInteger &b) const {
 	// This uses the copy constructor https://icarus.cs.weber.edu/~dab/cs1410/textbook/14.CPP_Relationships/copying.html
 	// The copy constructor deep copies the number std::string, so you do not need to worry that the underlying char arrays of the string
 	// are only address copied. See here: https://stackoverflow.com/a/5563997/9298528
 	BigInteger result(*this);
-	result.add(cmp);
+	result.add(b);
 	return result;
 }
-BigInteger BigInteger::operator -(const BigInteger &cmp) const {
+BigInteger BigInteger::operator -(const BigInteger &b) const {
 	BigInteger result(*this);
-	result.subtract(cmp);
+	result.subtract(b);
 	return result;
 }
-BigInteger BigInteger::operator *(const BigInteger &cmp) const {
+BigInteger BigInteger::operator *(const BigInteger &b) const {
 	BigInteger result(*this);
-	result.multiply(cmp);
+	result.multiply(b);
 	return result;
 }
-BigInteger BigInteger::operator /(const BigInteger &cmp) const {
+BigInteger BigInteger::operator /(const BigInteger &b) const {
 	BigInteger result(*this);
-	result.divide(cmp);
+	result.divide(b);
 	return result;
 }
-BigInteger BigInteger::operator %(const BigInteger &cmp) const {
+BigInteger BigInteger::operator %(const BigInteger &b) const {
 	BigInteger result(*this);
-	result.mod(cmp);
+	result.mod(b);
 	return result;
 }
-BigInteger BigInteger::operator ^(const BigInteger &cmp) const {
+BigInteger BigInteger::operator ^(const BigInteger &b) const {
 	BigInteger result(*this);
-	result.pow(cmp);
+	result.pow(b);
 	return result;
 }
-void BigInteger::operator +=(const BigInteger &cmp) {add(cmp);}
-void BigInteger::operator -=(const BigInteger &cmp) {subtract(cmp);}
-void BigInteger::operator *=(const BigInteger &cmp) {multiply(cmp);}
-void BigInteger::operator /=(const BigInteger &cmp) {divide(cmp);}
-void BigInteger::operator %=(const BigInteger &cmp) {mod(cmp);}
-void BigInteger::operator ^=(const BigInteger &cmp) {pow(cmp);}
+void BigInteger::operator +=(const BigInteger &b) {add(b);}
+void BigInteger::operator -=(const BigInteger &b) {subtract(b);}
+void BigInteger::operator *=(const BigInteger &b) {multiply(b);}
+void BigInteger::operator /=(const BigInteger &b) {divide(b);}
+void BigInteger::operator %=(const BigInteger &b) {mod(b);}
+void BigInteger::operator ^=(const BigInteger &b) {pow(b);}
 		
 char BigInteger::compare(const BigInteger &cmp) const {
 	// returns -1 if this is smaller; 0 if numbers are equal; 1 if this is greater
@@ -223,26 +254,6 @@ void BigInteger::resize(int n){number.resize(n);}
 bool BigInteger::isNegative() const {return isnegative;}
 void BigInteger::setNegative(bool s){isnegative = s;}
 
-std::string BigInteger::getBinaryString() const {
-	BigInteger b(*this);
-	BigInteger zero("0");
-	std::string result;
-	
-	if(getNumber() == "13642"){
-		int a = 5;
-	}
-	
-	while(b != zero){
-		BigInteger t(b);
-		BigInteger two(2);
-		t.mod(two);
-		std::string s = t.number;
-		result.append(s);
-		b /= 2;
-	}
-	
-	return result;
-}
 std::string BigInteger::getNumber() const {
 	std::string n;
 	for(int i = number.size()-1; i >= 0; i--){
@@ -368,6 +379,31 @@ BigInteger BigInteger::divide_digits(const BigInteger &divisor, bool mod){
 	}
 }
 
+std::string BigInteger::getBinaryString() const {
+	BigInteger b(*this);
+	BigInteger zero("0");
+	std::string result;
+	BigInteger two("2");
+
+	while(b != zero){
+		result.append((b % two).number);
+		b /= two;
+	}
+	
+	return result;
+}
+
+void BigInteger::fromBinaryString(const std::string &bin){
+	multiply(0);
+	for(int i = bin.size()-1; i >= 0; i--){
+		BigInteger exp(i);
+		BigInteger multiplicant(BigInteger(2) ^ exp);
+		BigInteger summand(bin[i]);
+		summand.multiply(multiplicant);	
+		add(summand);
+	}
+}
+
 void BigInteger::invertNumber(){
 	std::string n;
 	for(int i = number.size()-1; i >= 0; i--){n += number[i];}
@@ -379,13 +415,26 @@ int main(){
 	
 	
 	BigInteger a("658754366326");
-	a.printBinary();
+	/*a.printBinary();
 	
 	BigInteger b("9705457636");
 	b.printBinary();
 	
 	a.bitAnd(b);
 	a.printBinary();
+	a.print();
+	
+	a.bitShiftRight(5);
+	a.printBinary();
+	a.print();
+	
+	a.bitShiftLeft(5);
+	a.printBinary();
+	a.print();*/
+	
+	a = "5433561313";
+	a.print();
+	a.modpow("53561313", "43561313");
 	a.print();
 	
 	return 0;
