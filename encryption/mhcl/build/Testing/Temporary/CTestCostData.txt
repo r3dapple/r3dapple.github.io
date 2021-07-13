@@ -1,4 +1,0 @@
-my_test 0 0
-BITest1 1 0
----
-BITest1
