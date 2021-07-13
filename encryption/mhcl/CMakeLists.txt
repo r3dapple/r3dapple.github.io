@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16.3)
+project(MHCL VERSION 0.1 DESCRIPTION "mhcl, a cryptographic library" LANGUAGES CXX)
+add_subdirectory(test)
+add_subdirectory(src) 
+add_executable (demo src/main.cpp)
+target_link_libraries (demo biginteger)

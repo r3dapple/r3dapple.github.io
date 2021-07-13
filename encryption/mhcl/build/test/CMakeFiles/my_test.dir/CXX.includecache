@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/v/r3dapple.github.io/encryption/mhcl/src/biginteger/biginteger.h
+iostream
+-
+string
+-
+algorithm
+-
+cstring
+-
+
+/mnt/v/r3dapple.github.io/encryption/mhcl/test/test.cpp
+boost/test/unit_test.hpp
+-
+../src/biginteger/biginteger.h
+/mnt/v/r3dapple.github.io/encryption/mhcl/src/biginteger/biginteger.h
+

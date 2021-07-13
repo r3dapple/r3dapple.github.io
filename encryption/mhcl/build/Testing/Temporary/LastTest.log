@@ -1,0 +1,24 @@
+Start testing: Jul 14 00:11 CEST
+----------------------------------------------------------
+1/1 Testing: BITest1
+1/1 Test: BITest1
+Command: "/mnt/v/r3dapple.github.io/encryption/mhcl/build/test/biginteger_mult_test"
+Directory: /mnt/v/r3dapple.github.io/encryption/mhcl/build
+"BITest1" start time: Jul 14 00:11 CEST
+Output:
+----------------------------------------------------------
+Running 2 test cases...
+/mnt/v/r3dapple.github.io/encryption/mhcl/test/test.cpp(11): [1;31;49merror: in "SMALL_MULTIPLICATION": check r.getNumber() + "a" == b.getNumber() has failed [20a != 20][0;39;49m
+/mnt/v/r3dapple.github.io/encryption/mhcl/test/test.cpp(19): [1;31;49merror: in "BIG_MULTIPLICATION": check r.getNumber() + "a" == b.getNumber() has failed [109731067572139265403993971854515a != 109731067572139265403993971854515][0;39;49m
+
+[1;31;49m*** 2 failures are detected in the test module "BigIntegerTests"
+[0;39;49m
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Failed.
+"BITest1" end time: Jul 14 00:11 CEST
+"BITest1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jul 14 00:11 CEST
