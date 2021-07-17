@@ -8,8 +8,8 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
-#include "../biginteger/biginteger.h"
-#include "helper.h"
+#include "../biginteger/biginteger.hpp"
+#include "helper.hpp"
 
 class rsa_keypair {
 

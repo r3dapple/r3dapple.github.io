@@ -2,7 +2,7 @@
 #define HELPER_H_INCLUDED
 
 #include <fstream>
-#include "../biginteger/biginteger.h"
+#include "../biginteger/biginteger.hpp"
 
 BigInteger modpow(BigInteger base, BigInteger exp, BigInteger mod);
 BigInteger calculateJacobian(BigInteger a, BigInteger n);

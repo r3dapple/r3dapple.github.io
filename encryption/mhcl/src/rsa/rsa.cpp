@@ -1,6 +1,6 @@
-#include "rsa.h"
+#include "rsa.hpp"
 
-rsa_keypair::rsa_keypair(std::string public_key) : keySize(0), e(0), n(0), d(0), name("encrypt_only") {
+rsa_keypair::rsa_keypair(std::string public_key) : keySize(0), e(0), name("encrypt_only"), n(0), d(0){
 	initializePublic(public_key);
 }
 
@@ -25,7 +25,7 @@ void rsa_keypair::initializePublic(std::string public_key) {
 	std::cout << "Initialized " << name << " for encryption only!\n" << std::endl;
 }
 
-rsa_keypair::rsa_keypair() : keySize(0), e(0), n(0), d(0), name("unnamed") {}
+rsa_keypair::rsa_keypair() : keySize(0), e(0), name("unnamed"), n(0), d(0){}
 
 rsa_keypair::rsa_keypair(int keySize, int e = 3, const char *name = "myKeys") : keySize(keySize), e(e), name(name){
 

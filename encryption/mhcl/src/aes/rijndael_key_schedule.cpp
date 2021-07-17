@@ -1,4 +1,4 @@
-#include "rijndael_key_schedule.h"
+#include "rijndael_key_schedule.hpp"
 
 rijndael_key_schedule::rijndael_key_schedule(const unsigned char* key, int size, galois_field* gfield){
 	this->key_size = size;

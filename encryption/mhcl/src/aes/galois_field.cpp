@@ -1,4 +1,4 @@
-#include "galois_field.h"
+#include "galois_field.hpp"
 
 galois_field::galois_field(){this->generate_tables(229);}
 galois_field::galois_field(char generator){this->generate_tables(generator);}

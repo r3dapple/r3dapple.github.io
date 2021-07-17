@@ -1,4 +1,4 @@
-#include "termicolor.h"
+#include "termicolor.hpp"
 
 termicolor::termicolor(){
     std::mt19937 gen(device());

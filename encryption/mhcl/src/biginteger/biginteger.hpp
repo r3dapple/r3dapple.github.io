@@ -5,6 +5,8 @@
 #include <string>
 #include <algorithm>
 #include <cstring>
+#include <stdexcept>
+#include "dividebyzeroexception.hpp"
 
 class BigInteger{
 
@@ -12,6 +14,7 @@ class BigInteger{
 		BigInteger(const char*);
 		BigInteger(std::string);
 		BigInteger(int);
+		BigInteger(long);
 		BigInteger();
 		void print() const;
 		void printBinary() const;
@@ -47,13 +50,14 @@ class BigInteger{
 		void operator %=(const BigInteger&);
 		void operator ^=(const BigInteger&);
 		char compare(const BigInteger&) const ;
-		int getSize() const;
+		std::size_t getSize() const;
 		char& operator [](int);
 		char at(int) const;
 		void resize(int);
 		bool isNegative() const;
 		void setNegative(bool);
 		std::string getNumber() const;
+		std::string getNumber(bool) const;
 		friend std::ostream& operator<< (std::ostream& stream, const BigInteger&);
 		static BigInteger gcd(BigInteger, BigInteger);
 		static BigInteger modinv(const BigInteger&, const BigInteger&);

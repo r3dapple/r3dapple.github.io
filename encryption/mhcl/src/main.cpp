@@ -1,10 +1,10 @@
 #include <iostream>
 #include <string>
-#include "biginteger/biginteger.h"
-#include "rsa/rsa.h"
+#include "biginteger/biginteger.hpp"
+#include "rsa/rsa.hpp"
 //#include "aes/aes.h"
 
-int main(int argc, char** argv){
+int main(/*int argc, char** argv*/){
 
 /*
 	const unsigned char key[] = {0x41, 0xd, 0x5c, 0xcf, 0x7f, 0x93, 0x14, 0xbc, 0x35, 0x0, 0x6e, 0x0, 0x2c, 0xec, 0x0, 0x80, 0xd3, 0x65, 0x32, 0x10, 0xc3, 0xe5, 0x92, 0xf6, 0x19, 0x2c, 0x6d, 0x6c, 0x1f, 0xf, 0x49, 0x2f};
@@ -15,7 +15,7 @@ int main(int argc, char** argv){
 	machine.encrypt_file("testfile.txt", "testfile.txt.enc");
 	machine.decrypt_file("testfile.txt.enc", "testfile_dec.txt");
 */
-/*
+
 	rsa_keypair machine(128, 3, "TESTKEYS");
 	std::string s = "123412545675647";
 	BigInteger u(s);
@@ -27,10 +27,6 @@ int main(int argc, char** argv){
 	
 	BigInteger dec = machine.decrypt(enc);
 	dec.print();
-	*/
-
-	BigInteger b("3");
-	
 
 	return 0;
 }

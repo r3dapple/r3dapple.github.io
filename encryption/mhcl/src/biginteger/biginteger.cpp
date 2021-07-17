@@ -1,13 +1,4 @@
-#include "biginteger.h"
-
-class DivideByZeroException : public std::exception{
-	public:
-		const char* what() const noexcept{
-			return "Division by zero is unsupported behavior.";
-		}
-		~DivideByZeroException(){}
-};
-
+#include "biginteger.hpp"
 
 BigInteger::BigInteger(const char* n){
 	int size = std::strlen(n);
@@ -21,13 +12,26 @@ BigInteger::BigInteger(const char* n){
 	}
 	
 	number.resize(size-lowerbound, 0);
-	for(int i = size-1; i >= lowerbound; i--){
-		number[size-1-i] = n[i] - '0';
+
+	try{
+		for(int i = size-1; i >= lowerbound; i--){
+			// if we read at any point a non digit character, fall back on zero initialization
+			if(not std::isdigit(n[i])) throw std::invalid_argument("BigInteger(const char* n): '" + std::to_string(n[i]) + "' Non-digit input. Falling back on zero initialisation.");
+			number[size-1-i] = n[i] - '0';
+		}
+	}catch(std::invalid_argument &e){
+		number.resize(1);
+		number[0] = 0;
+		std::cerr << e.what() << std::endl;
 	}
+
+	// special case: if number is zero, the number should always be positive
+	if(getNumber(false) == "0") setNegative(false);
 }
 
 BigInteger::BigInteger(std::string s) : BigInteger(s.c_str()){}
 BigInteger::BigInteger(int i) : BigInteger(std::to_string(i)){}
+BigInteger::BigInteger(long l) : BigInteger(std::to_string(l)){}
 BigInteger::BigInteger() : BigInteger("0"){}
 
 void BigInteger::print() const {
@@ -54,6 +58,8 @@ void BigInteger::add(const BigInteger &summand2){
 	}else{
 		subtract_digits(summand2);
 	}
+	// special case: if result is zero, the number should always be positive
+	if(getNumber(false) == "0") setNegative(false);
 }
 
 // O(n*m)
@@ -65,10 +71,10 @@ void BigInteger::multiply(const BigInteger &multiplicator){
 	int maxlengthofresult = (int)number.size() + multiplicator.getSize();
 	result.resize(maxlengthofresult);
 	
-	for(int i = 0; i < multiplicator.getSize(); i++){
+	for(std::size_t i = 0; i < multiplicator.getSize(); i++){
 		char digit1 = multiplicator.at(i);
 		char carry = 0;
-		for(int j = i; j < number.size() + i || carry > 0; j++){
+		for(std::size_t j = i; j < number.size() + i || carry > 0; j++){
 			
 			char thisnumberdigit = j-i < number.size() ? number[j-i] : 0;
 			
@@ -80,6 +86,9 @@ void BigInteger::multiply(const BigInteger &multiplicator){
 
 	(*this) = result;
 	while(number[number.size()-1] == 0 && number.size() > 1) number.resize(number.size()-1);
+
+	// special case: if result is zero, the number should always be positive
+	if(getNumber(false) == "0") setNegative(false);
 }
 
 void BigInteger::subtract(const BigInteger &subtrahend){
@@ -93,6 +102,9 @@ void BigInteger::subtract(const BigInteger &subtrahend){
 	}
 	
 	setNegative(resultNegative);
+	
+	// special case: if result is zero, the number should always be positive
+	if(getNumber(false) == "0") setNegative(false);
 }
 
 void BigInteger::divide(const BigInteger &divisor){
@@ -100,8 +112,11 @@ void BigInteger::divide(const BigInteger &divisor){
 		(*this) = divide_digits(divisor, false);
 	}catch(DivideByZeroException &e){
 		std::cerr << e.what() << std::endl;
-		exit(0);
+		throw; // https://en.cppreference.com/w/cpp/language/throw -> Notes
 	}
+
+	// special case: if result is zero, the number should always be positive
+	if(getNumber(false) == "0") setNegative(false);
 }
 
 void BigInteger::mod(const BigInteger &divisor){
@@ -118,7 +133,7 @@ void BigInteger::mod(const BigInteger &divisor){
 
 void BigInteger::pow(BigInteger exponent){
 	// SUPPORT FOR NEGATIVE NUMBER AND POWER OF ZERO
-	if(exponent.getNumber() == "0"){BigInteger one("1"); (*this) = one; return;}
+	if(exponent.getNumber(false) == "0"){BigInteger one("1"); (*this) = one; return;}
 	BigInteger n((*this));
 	while(exponent > "1"){
 		multiply(n);
@@ -144,7 +159,7 @@ void BigInteger::bitOr(const BigInteger &operation_partner){
 	std::string numb = getBinaryString();
 	std::string opb = operation_partner.getBinaryString();
 	std::string res("");
-	res.resize(std::min(numb.size(), opb.size()), 0);
+	res.resize(std::max(numb.size(), opb.size()), 0);
 	
 	for(int i = res.size()-1; i >= 0; i--){
 		res[i] = numb[i] | opb[i];
@@ -251,8 +266,8 @@ BigInteger BigInteger::gcd(BigInteger a, BigInteger b) {
 }
 
 BigInteger BigInteger::modinv(const BigInteger &a, const BigInteger &m){
-    for (int x = 1; BigInteger(x) < m; x++)
-        if (((a%m) * (BigInteger(x)%m)) % m == 1)
+	for(int x = 1; BigInteger(x) < m; x++)
+        if(((a%m) * (BigInteger(x)%m)) % m == 1)
             return x;
 	return BigInteger("0");
 }
@@ -282,7 +297,7 @@ char BigInteger::compare(const BigInteger &cmp) const {
 	}
 }
 
-int BigInteger::getSize() const {return number.size();}
+std::size_t BigInteger::getSize() const {return number.size();}
 char& BigInteger::operator [](int ind){return number[ind];}
 char BigInteger::at(int ind) const {return number[ind];}
 void BigInteger::resize(int n){number.resize(n);}
@@ -290,7 +305,11 @@ bool BigInteger::isNegative() const {return isnegative;}
 void BigInteger::setNegative(bool s){isnegative = s;}
 
 std::string BigInteger::getNumber() const {
+	return getNumber(true);
+}
+std::string BigInteger::getNumber(bool sign) const {
 	std::string n;
+	if(sign && isNegative()) n = "-";
 	for(int i = number.size()-1; i >= 0; i--){
 		n += number[i] + '0';
 	}
@@ -298,12 +317,12 @@ std::string BigInteger::getNumber() const {
 }
 
 void BigInteger::add_digits(const BigInteger &summand2){
-	int maxlengthofresult = std::max(getSize(), summand2.getSize()) + 1;
+	std::size_t maxlengthofresult = std::max(getSize(), summand2.getSize()) + 1;
 	if(maxlengthofresult > number.size()) number.resize(maxlengthofresult, 0);
 	
 	char carry = 0;
 	
-	for(int i = 0; i < summand2.getSize() || carry > 0; i++){
+	for(std::size_t i = 0; i < summand2.getSize() || carry > 0; i++){
 		
 		char summand2digit = i < summand2.getSize() ? summand2.at(i) : 0;
 		char summand1digit = number[i];
@@ -331,7 +350,7 @@ void BigInteger::subtract_digits(BigInteger subtrahend){
 	
 	char carry = 0;
 	
-	for(int i = 0; i < getSize(); i++){
+	for(std::size_t i = 0; i < getSize(); i++){
 		char subtrahenddigit = i < subtrahend.getSize() ? subtrahend[i] : 0;
 		char minuenddigit = number[i];
 
@@ -366,9 +385,9 @@ char BigInteger::compare_digits(const BigInteger &cmp) const {
 }
 
 BigInteger BigInteger::divide_digits(const BigInteger &divisor, bool mod){
-	if(getNumber() == "0") throw DivideByZeroException();
+	if(divisor == "0") throw DivideByZeroException();
 	BigInteger result("0");
-	if(divisor == "0") return mod ? *this : result;
+	if(getNumber(false) == "0") return mod ? *this : result;
 	
 	// determine sign
 	if((isNegative() && !divisor.isNegative()) || (!isNegative() && divisor.isNegative())){result.setNegative(true);}
@@ -376,10 +395,10 @@ BigInteger BigInteger::divide_digits(const BigInteger &divisor, bool mod){
 	int maxlengthofresult = std::max(getSize(), divisor.getSize());
 	result.resize(maxlengthofresult);
 
-	int numerator_index = 1;
-	BigInteger partial_numerator(getNumber().substr(0, 1).c_str());
+	std::size_t numerator_index = 1;
+	BigInteger partial_numerator(getNumber(false).substr(0, 1).c_str());
 	for(; partial_numerator.compare_digits(divisor) == -1 && numerator_index <= getSize(); numerator_index++){
-		std::string num = partial_numerator.getNumber() + getNumber().substr(numerator_index, 1);
+		std::string num = partial_numerator.getNumber(false) + getNumber(false).substr(numerator_index, 1);
 		// https://stackoverflow.com/a/6868389/9298528
 		// placement new
 		// recreates partial_numerator in its own memory region but it could leak memory of pointers 
@@ -391,10 +410,10 @@ BigInteger BigInteger::divide_digits(const BigInteger &divisor, bool mod){
 	}
 	
 	int j = 0;
-	for(; numerator_index < getNumber().size() || j == 0; j++){
+	for(; numerator_index < getNumber(false).size() || j == 0; j++){
 	
 		if(partial_numerator.compare_digits(divisor) == -1 && numerator_index <= getSize()){
-			std::string num = partial_numerator.getNumber() + getNumber().substr(numerator_index, 1);
+			std::string num = partial_numerator.getNumber(false) + getNumber(false).substr(numerator_index, 1);
 
 			new (&partial_numerator) BigInteger(num.c_str());
 			numerator_index++;
@@ -408,7 +427,7 @@ BigInteger BigInteger::divide_digits(const BigInteger &divisor, bool mod){
 	}
 	if(mod){return partial_numerator;}
 	else{
-		while(result[result.getSize()-1] == 0 && result.getSize() > std::max(j,1)) result.resize(result.getSize()-1);
+		while(result[result.getSize()-1] == 0 && result.getSize() > std::max<std::size_t>(j,1)) result.resize(result.getSize()-1);
 		result.invertNumber();
 		return result;
 	}

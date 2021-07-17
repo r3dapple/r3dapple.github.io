@@ -1,4 +1,4 @@
-#include "helper.h"
+#include "helper.hpp"
 
 bool fileExists(const char *name) {
     std::ifstream f(name);
