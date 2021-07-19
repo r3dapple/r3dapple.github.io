@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 add_compile_options(-Wall -Wextra -pedantic -Werror)
 project(MHCL VERSION 0.1 DESCRIPTION "mhcl, a cryptographic library" LANGUAGES CXX)
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fprofile-arcs -ftest-coverage") # -pg for data on how much time was spent on functions
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 add_subdirectory(test)

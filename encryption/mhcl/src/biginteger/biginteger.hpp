@@ -60,7 +60,7 @@ class BigInteger{
 		std::string getNumber(bool) const;
 		friend std::ostream& operator<< (std::ostream& stream, const BigInteger&);
 		static BigInteger gcd(BigInteger, BigInteger);
-		static BigInteger modinv(const BigInteger&, const BigInteger&);
+		static BigInteger modinv(BigInteger, BigInteger);
 	private:
 		std::string number;
 		bool isnegative;

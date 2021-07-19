@@ -29,8 +29,8 @@ rsa_keypair::rsa_keypair() : keySize(0), e(0), name("unnamed"), n(0), d(0){}
 
 rsa_keypair::rsa_keypair(int keySize, int e = 3, const char *name = "myKeys") : keySize(keySize), e(e), name(name){
 
-	if(keySize % 128 != 0){
-		throw "Invalid key size. Use keySize % 128 = 0";
+	if(keySize % 128 != 0){ // TODO: Dont allow keygeneration smaller than 2048, everything else is insecure
+		throw "Invalid key size. Use keySize % 128 = 0"; // TODO: dont throw const char*'s ...
 	}
 
 	if(std::strlen(name) > 90){
@@ -41,21 +41,22 @@ rsa_keypair::rsa_keypair(int keySize, int e = 3, const char *name = "myKeys") : 
 	q = getLargePrimeQ(keySize);
 	n = p * q;
 
-	phi = ((p-1)*(q-1))/BigInteger::gcd(p-1, q-1);
+	BigInteger gcd = BigInteger::gcd(p-1, q-1);
+	phi = ((p-1)*(q-1))/gcd;
 
 	while(1){
 		try{
-			d = BigInteger::modinv(e, phi);
+			d = BigInteger::modinv(this->e, phi); // this is endless for some reason
 			break;
-		}catch(const char* ex){
-			std::cout << ex << std::endl;
-			if(e == 3) e = 5;
-			else if(e == 5) e = 17;
-			else if(e == 17) e = 257;
-			else if(e == 257) e = 65537;
-			else e++;
+		}catch(DivideByZeroException &ex){
+			std::cout << ex.what() << std::endl;
+			if(this->e == 3) this->e = 5;
+			else if(this->e == 5) this->e = 17;
+			else if(this->e == 17) this->e = 257;
+			else if(this->e == 257) this->e = 65537;
+			else this->e++;
 			// phi cant share a factor with e
-			std::cout << "Increasing e to " << e << std::endl;
+			std::cout << "Increasing e to " << this->e << std::endl;
 			std::cout << std::endl;
 		}
 	}
@@ -63,7 +64,7 @@ rsa_keypair::rsa_keypair(int keySize, int e = 3, const char *name = "myKeys") : 
 	std::cout << "n = " << n << std::endl;
 	std::cout << "phi = " << phi << std::endl;
 	std::cout << "d = " << d << std::endl;
-	std::cout << "e = " << e << std::endl;
+	std::cout << "e = " << this->e << std::endl;
 	std::cout << std::endl;
 }
 

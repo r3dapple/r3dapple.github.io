@@ -16,7 +16,7 @@ int main(/*int argc, char** argv*/){
 	machine.decrypt_file("testfile.txt.enc", "testfile_dec.txt");
 */
 
-	rsa_keypair machine(128, 3, "TESTKEYS");
+	rsa_keypair machine(512, 65537, "TESTKEYS");
 	std::string s = "123412545675647";
 	BigInteger u(s);
 	

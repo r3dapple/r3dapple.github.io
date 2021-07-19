@@ -152,6 +152,8 @@ void BigInteger::bitAnd(const BigInteger &operation_partner){
 	}
 
 	fromBinaryString(res);
+	// special case: if result is zero, the number should always be positive
+	if(getNumber(false) == "0") setNegative(false);
 }
 
 void BigInteger::bitOr(const BigInteger &operation_partner){
@@ -161,8 +163,8 @@ void BigInteger::bitOr(const BigInteger &operation_partner){
 	std::string res("");
 	res.resize(std::max(numb.size(), opb.size()), 0);
 	
-	for(int i = res.size()-1; i >= 0; i--){
-		res[i] = numb[i] | opb[i];
+	for(long int i = res.size()-1; i >= 0; i--){
+		res[i] = (((long unsigned int)i < numb.size()) ? numb[i] : 0) | (((long unsigned int)i < opb.size()) ? opb[i] : 0);
 	}
 
 	fromBinaryString(res);
@@ -183,20 +185,22 @@ void BigInteger::bitShiftRight(int count){
 void BigInteger::bitShiftLeft(int count){
 	
 	std::string numb = getBinaryString();
-	std::string res("");
+	/**std::string res("");
 	int a = numb.size()-count;
 	res.resize(a > 0 ? a : 0);
 	
 	res = numb.substr(0, numb.size()-1-count);
-	res.insert(0, count, 0);
+	res.insert(0, count, 0);**/
 
-	fromBinaryString(res);
+	numb.insert(0, count, 0);
+
+	fromBinaryString(numb);
 }
 
 void BigInteger::modpow(BigInteger exp, const BigInteger &mod){
 	BigInteger base(*this);
 	base %= mod;
-	base = base % mod;
+	//base = base % mod;
 	BigInteger result("1");
 	BigInteger one("1");
 	BigInteger zero("0");
@@ -210,6 +214,28 @@ void BigInteger::modpow(BigInteger exp, const BigInteger &mod){
 	}
 	
 	(*this) = result;
+
+   /* BigInteger res = 1;     // Initialize result
+ 
+    x = x % p; // Update x if it is more than or
+                // equal to p
+  
+    if (x == 0) return BigInteger(0); // In case x is divisible by p;
+ 
+    while (y > 0)
+    {
+        // If y is odd, multiply x with result
+		BigInteger yandone = y;
+		yandone.bitAnd(1);
+        if (not (yandone == 0))
+            res = (res*x) % p;
+ 
+        // y must be even now
+        y.bitShiftLeft(1); // y = y/2
+        x = (x*x) % p;
+    }
+    return res;*/
+
 }
 
 
@@ -265,11 +291,23 @@ BigInteger BigInteger::gcd(BigInteger a, BigInteger b) {
 	}
 }
 
-BigInteger BigInteger::modinv(const BigInteger &a, const BigInteger &m){
-	for(int x = 1; BigInteger(x) < m; x++)
+BigInteger BigInteger::modinv(BigInteger a, BigInteger b){
+	/*for(int x = 1; BigInteger(x) < m; x++)
         if(((a%m) * (BigInteger(x)%m)) % m == 1)
             return x;
-	return BigInteger("0");
+	return BigInteger("0");*/
+	BigInteger b0 = b, t, q;
+	BigInteger x0 = 0, x1 = 1;
+	if (b == 1) return 1;
+	while (a > 1) {
+		q = a / b;
+		t = b;
+		b = a % b;
+		a = t;
+		t = x0, x0 = x1 - q * x0, x1 = t;
+	}
+	if (x1 < 0) x1 += b0;
+	return x1;
 }
 
 void BigInteger::operator +=(const BigInteger &b) {add(b);}
@@ -448,6 +486,8 @@ std::string BigInteger::getBinaryString() const {
 }
 
 void BigInteger::fromBinaryString(const std::string &bin){
+	// preserve sign
+	bool presneg = isNegative();
 	multiply(0);
 	for(int i = bin.size()-1; i >= 0; i--){
 		BigInteger exp(i);
@@ -456,6 +496,7 @@ void BigInteger::fromBinaryString(const std::string &bin){
 		summand.multiply(multiplicant);	
 		add(summand);
 	}
+	setNegative(presneg);
 }
 
 void BigInteger::invertNumber(){

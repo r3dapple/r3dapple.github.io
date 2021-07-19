@@ -82,6 +82,7 @@ bool solovoyStrassen(BigInteger p, int iterations)
 }
 
 BigInteger getLargePrimeQ(int keysize){
+    //srand(time(NULL));
     // begins at 11111111111111111 ... keysize/2 1's
     BigInteger candidate = 1;
     BigInteger one = 1;
@@ -102,13 +103,14 @@ BigInteger getLargePrimeQ(int keysize){
 }
 
 BigInteger getLargePrimeP(int keysize){
+    //srand(time(NULL));
     // begins at 100000000000 ... keysize/2-1 0's and one 1
     BigInteger candidate = 1;
     candidate.bitShiftLeft(((keysize)/2)-1);
     std::cout << candidate << std::endl;
 
     for (;;) {
-        if ( solovoyStrassen(candidate, 65) ){
+        if (solovoyStrassen(candidate, 65)){
             std::cout << candidate << " is prime" << std::endl;
             return candidate;
         }
