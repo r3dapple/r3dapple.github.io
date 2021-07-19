@@ -27,14 +27,10 @@ void rsa_keypair::initializePublic(std::string public_key) {
 
 rsa_keypair::rsa_keypair() : keySize(0), e(0), name("unnamed"), n(0), d(0){}
 
-rsa_keypair::rsa_keypair(int keySize, int e = 3, const char *name = "myKeys") : keySize(keySize), e(e), name(name){
+rsa_keypair::rsa_keypair(int keySize, int e = 3, std::string name = "myKeys") : keySize(keySize), e(e), name(name){
 
-	if(keySize % 128 != 0){ // TODO: Dont allow keygeneration smaller than 2048, everything else is insecure
-		throw "Invalid key size. Use keySize % 128 = 0"; // TODO: dont throw const char*'s ...
-	}
-
-	if(std::strlen(name) > 90){
-		throw "Name too large";
+	if(keySize < 2048 || keySize % 128 != 0){
+		throw std::invalid_argument("Invalid key size. Use keySize % 128 = 0");
 	}
 
 	p = getLargePrimeP(keySize);
@@ -75,14 +71,8 @@ BigInteger rsa_keypair::encrypt(BigInteger x){
 }
 
 void rsa_keypair::save(){
-
-    char public_file_name[100];
-    strcpy(public_file_name, name);
-    strcat(public_file_name, "_public.txt");
-
-    char private_file_name[100];
-    strcpy(private_file_name, name);
-    strcat(private_file_name, "_private.txt");
+    std::string public_file_name = name + "_public.txt";
+    std::string private_file_name = name + "_private.txt";
 
     std::ofstream public_file(public_file_name, std::ios::out);
     std::string public_key_string = n.getNumber() + "." + std::to_string(e);

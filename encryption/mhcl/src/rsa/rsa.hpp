@@ -8,6 +8,7 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <stdexcept>
 #include "../biginteger/biginteger.hpp"
 #include "helper.hpp"
 
@@ -16,7 +17,7 @@ class rsa_keypair {
 private:
 	int keySize;
 	int e;
-	const char* name;
+	std::string name;
 	BigInteger p;
 	BigInteger q;
 	BigInteger n;
@@ -26,7 +27,7 @@ private:
 public:
 	rsa_keypair();
 	rsa_keypair(std::string);
-	rsa_keypair(int, int, const char*);
+	rsa_keypair(int, int, std::string);
 
 	void initializePublic(std::string);
 	void save();
