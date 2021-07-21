@@ -1,15 +1,15 @@
-#ifndef galois_field_h
-#define galois_field_h
+#ifndef galoisfield_h
+#define galoisfield_h
 
 #include <iostream>
 
 // https://www.samiam.org/galois.html
 
-class galois_field{
+class GaloisField{
 
 	public:
-		galois_field();
-		galois_field(char);
+		GaloisField();
+		GaloisField(char);
 		unsigned char gadd(unsigned char, unsigned char);
 		unsigned char gsub(unsigned char, unsigned char);
 		unsigned char gmul_slow(unsigned char, unsigned char);

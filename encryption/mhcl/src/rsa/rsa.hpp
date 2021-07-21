@@ -12,29 +12,28 @@
 #include "../biginteger/biginteger.hpp"
 #include "helper.hpp"
 
-class rsa_keypair {
+class rsa {
+	private:
+		int keySize;
+		int e;
+		std::string name;
+		BigInteger p;
+		BigInteger q;
+		BigInteger n;
+		BigInteger phi;
+		BigInteger d;
+		
+	public:
+		rsa();
+		rsa(std::string);
+		rsa(int, int, std::string);
 
-private:
-	int keySize;
-	int e;
-	std::string name;
-	BigInteger p;
-	BigInteger q;
-	BigInteger n;
-	BigInteger phi;
-	BigInteger d;
-	
-public:
-	rsa_keypair();
-	rsa_keypair(std::string);
-	rsa_keypair(int, int, std::string);
-
-	void initializePublic(std::string);
-	void save();
-	void load(std::string);
-	void loadPrivateFromString(std::string);
-	BigInteger encrypt(BigInteger);
-	BigInteger decrypt(BigInteger);
+		void initializePublic(std::string);
+		void save();
+		void load(std::string);
+		void loadPrivateFromString(std::string);
+		BigInteger encrypt(BigInteger);
+		BigInteger decrypt(BigInteger);
 };
 
 #endif // RSA_H_INCLUDED

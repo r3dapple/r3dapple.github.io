@@ -116,12 +116,11 @@ const unsigned char* aes::generateKey(int key_size){
 aes::aes(int key_size=128, int verbosity_level=2){
 
 	const unsigned char* key = generateKey(key_size);
-	// hier liegt der key noch in memory (possible attack)
 
-	this->gfield = new galois_field(192);
+	this->gfield = new GaloisField(192);
 	if(verbosity_level == 3)gfield->printTables();
 
-	scheduler = new rijndael_key_schedule(key, key_size, gfield);
+	scheduler = new RijndaelKeySchedule(key, key_size, gfield);
 	if(verbosity_level >= 1)scheduler->printExpandedKey();
 	this->expanded_key = scheduler->getExpandedKey();
 	
@@ -134,10 +133,10 @@ aes::aes(int key_size=128, int verbosity_level=2){
 }
 
 aes::aes(const unsigned char* key, int key_size=128, int verbosity_level=2){
-	this->gfield = new galois_field(192);
+	this->gfield = new GaloisField(192);
 	if(verbosity_level == 3)gfield->printTables();
 
-	scheduler = new rijndael_key_schedule(key, key_size, gfield);
+	scheduler = new RijndaelKeySchedule(key, key_size, gfield);
 	if(verbosity_level >= 1)scheduler->printExpandedKey();
 	this->expanded_key = scheduler->getExpandedKey();
 	
@@ -150,10 +149,10 @@ aes::aes(const unsigned char* key, int key_size=128, int verbosity_level=2){
 }
 
 aes::aes(const unsigned char* key, const unsigned char* IV, int key_size=128, int verbosity_level=2){
-	this->gfield = new galois_field(192);
+	this->gfield = new GaloisField(192);
 	if(verbosity_level == 3)gfield->printTables();
 
-	scheduler = new rijndael_key_schedule(key, key_size, gfield);
+	scheduler = new RijndaelKeySchedule(key, key_size, gfield);
 	if(verbosity_level >= 1)scheduler->printExpandedKey();
 	this->expanded_key = scheduler->getExpandedKey();
 	

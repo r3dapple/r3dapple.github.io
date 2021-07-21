@@ -1,10 +1,10 @@
 #include "rsa.hpp"
 
-rsa_keypair::rsa_keypair(std::string public_key) : keySize(0), e(0), name("encrypt_only"), n(0), d(0){
+rsa::rsa(std::string public_key) : keySize(0), e(0), name("encrypt_only"), n(0), d(0) {
 	initializePublic(public_key);
 }
 
-void rsa_keypair::initializePublic(std::string public_key) {
+void rsa::initializePublic(std::string public_key) {
 
 	std::istringstream iss(public_key);
 	std::string tempS;
@@ -25,11 +25,15 @@ void rsa_keypair::initializePublic(std::string public_key) {
 	std::cout << "Initialized " << name << " for encryption only!\n" << std::endl;
 }
 
-rsa_keypair::rsa_keypair() : keySize(0), e(0), name("unnamed"), n(0), d(0){}
+rsa::rsa() : keySize(0), e(0), name("unnamed"), n(0), d(0){}
 
-rsa_keypair::rsa_keypair(int keySize, int e = 3, std::string name = "myKeys") : keySize(keySize), e(e), name(name){
-
-	if(keySize < 2048 || keySize % 128 != 0){
+rsa::rsa(int keySize, int e = 3, std::string name = "myKeys") : keySize(keySize), e(e), name(name) {
+/*
+	if(keySize < 2048){
+		throw std::invalid_argument("Unsafe key size. Choose a key length >= 2048.");
+	}
+*/
+	if(keySize % 128 != 0){
 		throw std::invalid_argument("Invalid key size. Use keySize % 128 = 0");
 	}
 
@@ -40,9 +44,9 @@ rsa_keypair::rsa_keypair(int keySize, int e = 3, std::string name = "myKeys") : 
 	BigInteger gcd = BigInteger::gcd(p-1, q-1);
 	phi = ((p-1)*(q-1))/gcd;
 
-	while(1){
+	while(1) {
 		try{
-			d = BigInteger::modinv(this->e, phi); // this is endless for some reason
+			d = BigInteger::modinv(this->e, phi);
 			break;
 		}catch(DivideByZeroException &ex){
 			std::cout << ex.what() << std::endl;
@@ -64,13 +68,13 @@ rsa_keypair::rsa_keypair(int keySize, int e = 3, std::string name = "myKeys") : 
 	std::cout << std::endl;
 }
 
-BigInteger rsa_keypair::encrypt(BigInteger x){
+BigInteger rsa::encrypt(BigInteger x){
     if(x >= n) {return BigInteger();}
-	x.modpow(e,n);
+	x.modpow(n, e, true);
     return x;
 }
 
-void rsa_keypair::save(){
+void rsa::save(){
     std::string public_file_name = name + "_public.txt";
     std::string private_file_name = name + "_private.txt";
 
@@ -87,7 +91,7 @@ void rsa_keypair::save(){
     std::cout << "Saved " << name << "!\n" << std::endl;
 }
 
-void rsa_keypair::load(std::string private_key_file){
+void rsa::load(std::string private_key_file){
 
     std::ifstream private_file(private_key_file, std::ios::in);
     std::string private_key_string;
@@ -97,7 +101,7 @@ void rsa_keypair::load(std::string private_key_file){
 	loadPrivateFromString(private_key_string);
 }
 
-void rsa_keypair::loadPrivateFromString(std::string private_key){
+void rsa::loadPrivateFromString(std::string private_key){
 
 	std::string tempS;
     std::istringstream iss(private_key);
@@ -119,7 +123,7 @@ void rsa_keypair::loadPrivateFromString(std::string private_key){
     std::cout << "Loaded " << name << "!\n" << std::endl;
 }
 
-BigInteger rsa_keypair::decrypt(BigInteger x){
-	x.modpow(d,n);
+BigInteger rsa::decrypt(BigInteger x){
+	x.modpow(n, d, true);
     return x;
 }

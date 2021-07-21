@@ -16,8 +16,12 @@ int main(/*int argc, char** argv*/){
 	machine.decrypt_file("testfile.txt.enc", "testfile_dec.txt");
 */
 
-	rsa_keypair machine(512, 65537, "TESTKEYS");
-	std::string s = "123412545675647";
+	//rsa machine(2048, 65537, "TESTKEYS");
+	//machine.save();
+	rsa machine;
+	machine.load("TESTKEYS_private.txt");
+
+	std::string s = "3452365756756734";
 	BigInteger u(s);
 	
 	u.print();

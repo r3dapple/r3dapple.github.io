@@ -1,13 +1,13 @@
-#include "galois_field.hpp"
+#include "galoisfield.hpp"
 
-galois_field::galois_field(){this->generate_tables(229);}
-galois_field::galois_field(char generator){this->generate_tables(generator);}
+GaloisField::GaloisField(){this->generate_tables(229);}
+GaloisField::GaloisField(char generator){this->generate_tables(generator);}
 
 
-unsigned char galois_field::gadd(unsigned char a, unsigned char b) {return a ^ b;}
-unsigned char galois_field::gsub(unsigned char a, unsigned char b) {return a ^ b;}
+unsigned char GaloisField::gadd(unsigned char a, unsigned char b) {return a ^ b;}
+unsigned char GaloisField::gsub(unsigned char a, unsigned char b) {return a ^ b;}
 
-unsigned char galois_field::gmul_slow(unsigned char a, unsigned char b) {
+unsigned char GaloisField::gmul_slow(unsigned char a, unsigned char b) {
 	unsigned char p = 0;
 	unsigned char counter;
 	unsigned char hi_bit_set;
@@ -23,7 +23,7 @@ unsigned char galois_field::gmul_slow(unsigned char a, unsigned char b) {
 	return p;
 }
 
-void galois_field::gmix_column(unsigned char *r) {
+void GaloisField::gmix_column(unsigned char *r) {
     unsigned char a[4];
     unsigned char b[4];
 	unsigned char c;
@@ -32,29 +32,28 @@ void galois_field::gmix_column(unsigned char *r) {
 		a[c] = r[c];
 		h = r[c] & 0x80; /* hi bit */
 		b[c] = r[c] << 1;
-		if(h == 0x80) 
+		if(h == 0x80)
 			b[c] ^= 0x1b; /* Rijndael's Galois field */
-		}
+	}
 	r[0] = b[0] ^ a[3] ^ a[2] ^ b[1] ^ a[1];
 	r[1] = b[1] ^ a[0] ^ a[3] ^ b[2] ^ a[2];
 	r[2] = b[2] ^ a[1] ^ a[0] ^ b[3] ^ a[3];
 	r[3] = b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0];
 }
 
-void galois_field::ginv_mix_column(unsigned char *r) {
+void GaloisField::ginv_mix_column(unsigned char *r) {
         unsigned char a[4];
         unsigned char c;
         for(c=0;c<4;c++) {
-                a[c] = r[c];
-                }
+			a[c] = r[c];
+        }
         r[0] = gmul(a[0],14) ^ gmul(a[3],9) ^ gmul(a[2],13) ^ gmul(a[1],11);
         r[1] = gmul(a[1],14) ^ gmul(a[0],9) ^ gmul(a[3],13) ^ gmul(a[2],11);
         r[2] = gmul(a[2],14) ^ gmul(a[1],9) ^ gmul(a[0],13) ^ gmul(a[3],11);
         r[3] = gmul(a[3],14) ^ gmul(a[2],9) ^ gmul(a[1],13) ^ gmul(a[0],11);
 }
 
-void galois_field::generate_tables(unsigned char generator){
-
+void GaloisField::generate_tables(unsigned char generator){
 	if(this->isGeneratorViable(generator) == false) return;
 
 	this->atable[0] = 1;
@@ -73,7 +72,7 @@ void galois_field::generate_tables(unsigned char generator){
 }
 
 /* Calculate the s-box for a given number */
-unsigned char galois_field::sbox(unsigned char in) {
+unsigned char GaloisField::sbox(unsigned char in) {
 	unsigned char c, s, x;
 	s = x = gmul_inverse(in);
 	for(c = 0; c < 4; c++) {
@@ -86,8 +85,7 @@ unsigned char galois_field::sbox(unsigned char in) {
 	return x;
 }
 
-/* Calculate the s-box for a given number */
-unsigned char galois_field::inv_sbox(unsigned char in) {
+unsigned char GaloisField::inv_sbox(unsigned char in) {
 	unsigned char leftside = (in & 0xF0) >> 4;
 	unsigned char rightside = (in & 0x0F);
 	//std::cout << "Leftside: " << (int)leftside << " | " << "Rightside: " << (int)rightside << " | " << " Ergebnis: " << (int)leftside*17 + (int)rightside;
@@ -95,7 +93,7 @@ unsigned char galois_field::inv_sbox(unsigned char in) {
 	//return inv_sbtable[0xf0];
 }
 
-unsigned char galois_field::gmul(unsigned char a, unsigned char b) {
+unsigned char GaloisField::gmul(unsigned char a, unsigned char b) {
 	int s;
 	int q;
 	int z = 0;
@@ -110,35 +108,35 @@ unsigned char galois_field::gmul(unsigned char a, unsigned char b) {
 	q = s;
 	if(a == 0) {
 		s = z;
-	}
-	else {
+	}else {
 		s = q;
 	}
+
 	if(b == 0) {
 		s = z;
-	} 
-	else {
+	}else {
 		q = z;
 	}
+
 	return s;
 }
 
-unsigned char galois_field::gmul_inverse(unsigned char in) {
+unsigned char GaloisField::gmul_inverse(unsigned char in) {
 	/* 0 is self inverting */
 	if(in == 0) 
 		return 0;
 	else
-        	return atable[(255 - ltable[in])];
+        return atable[(255 - ltable[in])];
 }
 
-void galois_field::printTables(){
-
+void GaloisField::printTables(){
 	std::cout << std::hex;
 
 	for(int i = 0; i < 256; i++){
 		if(i % 16 == 0) std::cout << std::endl;
 		std::cout << (int)atable[i] << " ";
 	}
+	
 	std::cout << std::endl;
 	std::cout << std::endl;
 
@@ -151,21 +149,22 @@ void galois_field::printTables(){
 	std::cout << std::endl;
 }
 
-bool galois_field::isGeneratorViable(unsigned char generator){
+bool GaloisField::isGeneratorViable(unsigned char generator){
 	for(int i = 0; i < 128; i++){
 		if(generator == possible_generators[i]){
 			return true;
 		}
 	}
+
 	std::cout << "Nonviable generator" << std::endl;
 	return false;
 }
 
 void rotate(unsigned char *in) {
-        unsigned char a,c;
-        a = in[0];
-        for(c=0;c<3;c++) 
-                in[c] = in[c + 1];
-        in[3] = a;
-        return;
+	unsigned char a,c;
+	a = in[0];
+	for(c=0;c<3;c++) 
+		in[c] = in[c + 1];
+	in[3] = a;
+	return;
 }

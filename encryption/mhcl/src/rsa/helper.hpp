@@ -4,7 +4,6 @@
 #include <fstream>
 #include "../biginteger/biginteger.hpp"
 
-BigInteger modpow(BigInteger base, BigInteger exp, BigInteger mod);
 BigInteger calculateJacobian(BigInteger a, BigInteger n);
 BigInteger modulo(BigInteger base, BigInteger exponent, BigInteger mod);
 bool solovoyStrassen(BigInteger p, int iterations);

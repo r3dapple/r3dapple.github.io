@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cstring>
 #include <random>
-#include "rijndael_key_schedule.h"
-#include "galois_field.h"
+#include "rijndaelkeyschedule.hpp"
+#include "galoisfield.hpp"
 #include <fstream>
 
 class aes{
@@ -37,8 +37,8 @@ class aes{
 		void writeFileBytes(const char*, char*, int);
 		const unsigned char* generateKey(int);
 
-		rijndael_key_schedule* scheduler;
-		galois_field* gfield;
+		RijndaelKeySchedule* scheduler;
+		GaloisField* gfield;
 		termicolor *termcol;
 		unsigned char* expanded_key;
 		int verbosity_level;	

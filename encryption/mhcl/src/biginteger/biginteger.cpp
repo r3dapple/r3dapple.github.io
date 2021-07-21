@@ -108,15 +108,17 @@ void BigInteger::subtract(const BigInteger &subtrahend){
 }
 
 void BigInteger::divide(const BigInteger &divisor){
+
 	try{
-		(*this) = divide_digits(divisor, false);
+		(*this) = divide_digits(divisor, false, true);
 	}catch(DivideByZeroException &e){
 		std::cerr << e.what() << std::endl;
-		throw; // https://en.cppreference.com/w/cpp/language/throw -> Notes
+		throw; // https://en.cppreference.com/w/cpp/language/throw -> Notes -> Rethrow
 	}
 
 	// special case: if result is zero, the number should always be positive
 	if(getNumber(false) == "0") setNegative(false);
+	
 }
 
 void BigInteger::mod(const BigInteger &divisor){
@@ -124,11 +126,14 @@ void BigInteger::mod(const BigInteger &divisor){
 	// so calling this mod is not entirely correct; this is actually the remainder; maybe ill fix this some time
 	// (trivia: % is the remainder in C/C++)
 	try{
-		(*this) = divide_digits(divisor, true);
+		(*this) = divide_digits(divisor, true, true);
 	}catch(DivideByZeroException &e){
 		std::cerr << e.what() << std::endl;
-		exit(0);
+		throw; // https://en.cppreference.com/w/cpp/language/throw -> Notes -> Rethrow
 	}
+
+	// special case: if result is zero, the number should always be positive
+	if(getNumber(false) == "0") setNegative(false);
 }
 
 void BigInteger::pow(BigInteger exponent){
@@ -183,62 +188,62 @@ void BigInteger::bitShiftRight(int count){
 }
 
 void BigInteger::bitShiftLeft(int count){
-	
 	std::string numb = getBinaryString();
-	/**std::string res("");
-	int a = numb.size()-count;
-	res.resize(a > 0 ? a : 0);
-	
-	res = numb.substr(0, numb.size()-1-count);
-	res.insert(0, count, 0);**/
-
 	numb.insert(0, count, 0);
-
 	fromBinaryString(numb);
 }
 
-void BigInteger::modpow(BigInteger exp, const BigInteger &mod){
-	BigInteger base(*this);
-	base %= mod;
-	//base = base % mod;
-	BigInteger result("1");
-	BigInteger one("1");
-	BigInteger zero("0");
+void BigInteger::modpow(const BigInteger& mod, BigInteger exp, bool usegmp){
 
-	while (exp > zero) {
-		BigInteger h(exp);
-		h.bitAnd(one);
-		if (h != zero) result = (result * base) % mod;
-		base = (base * base) % mod;
-		exp.bitShiftRight(1);
+	// todo: make gmp modpow option aswell, this implementation is too slow
+	if(usegmp){ // https://gmplib.org/manual/Integer-Exponentiation
+
+		char* res = 0;
+
+		mpz_t base_gmp;
+		mpz_init(base_gmp);
+		mpz_set_str(base_gmp, getNumber(false).c_str(), 10);
+
+		mpz_t exp_gmp;
+		mpz_init(exp_gmp);
+		mpz_set_str(exp_gmp, exp.getNumber(false).c_str(), 10);
+		
+		mpz_t mod_gmp;
+		mpz_init(mod_gmp);
+		mpz_set_str(mod_gmp, mod.getNumber(false).c_str(), 10);
+
+		mpz_t res_gmp;
+		mpz_init(res_gmp);
+
+		mpz_powm_sec(res_gmp, base_gmp, exp_gmp, mod_gmp);
+		
+		res = mpz_get_str(NULL, 10, res_gmp);
+		(*this) = res;
+		mpz_clear(base_gmp);
+		mpz_clear(exp_gmp);
+		mpz_clear(mod_gmp);
+		mpz_clear(res_gmp);
+
+		delete[] res;
+	}else{
+		BigInteger base(*this);
+		base %= mod;
+		BigInteger result("1");
+		BigInteger one("1");
+		BigInteger zero("0");
+
+		while (exp > zero) {
+			BigInteger h(exp);
+			h.bitAnd(one);
+			if (h != zero) result = (result * base) % mod;
+			base = (base * base) % mod;
+			exp.bitShiftRight(1);
+		}
+		
+		(*this) = result;
 	}
-	
-	(*this) = result;
-
-   /* BigInteger res = 1;     // Initialize result
- 
-    x = x % p; // Update x if it is more than or
-                // equal to p
-  
-    if (x == 0) return BigInteger(0); // In case x is divisible by p;
- 
-    while (y > 0)
-    {
-        // If y is odd, multiply x with result
-		BigInteger yandone = y;
-		yandone.bitAnd(1);
-        if (not (yandone == 0))
-            res = (res*x) % p;
- 
-        // y must be even now
-        y.bitShiftLeft(1); // y = y/2
-        x = (x*x) % p;
-    }
-    return res;*/
 
 }
-
-
 
 bool BigInteger::operator <(const BigInteger &cmp) const {return compare(cmp) == -1;}
 bool BigInteger::operator >(const BigInteger &cmp) const {return compare(cmp) == 1;}
@@ -292,10 +297,6 @@ BigInteger BigInteger::gcd(BigInteger a, BigInteger b) {
 }
 
 BigInteger BigInteger::modinv(BigInteger a, BigInteger b){
-	/*for(int x = 1; BigInteger(x) < m; x++)
-        if(((a%m) * (BigInteger(x)%m)) % m == 1)
-            return x;
-	return BigInteger("0");*/
 	BigInteger b0 = b, t, q;
 	BigInteger x0 = 0, x1 = 1;
 	if (b == 1) return 1;
@@ -422,7 +423,7 @@ char BigInteger::compare_digits(const BigInteger &cmp) const {
 	return 0;
 }
 
-BigInteger BigInteger::divide_digits(const BigInteger &divisor, bool mod){
+BigInteger BigInteger::divide_digits(const BigInteger &divisor, bool mod, bool usegmp){
 	if(divisor == "0") throw DivideByZeroException();
 	BigInteger result("0");
 	if(getNumber(false) == "0") return mod ? *this : result;
@@ -430,44 +431,78 @@ BigInteger BigInteger::divide_digits(const BigInteger &divisor, bool mod){
 	// determine sign
 	if((isNegative() && !divisor.isNegative()) || (!isNegative() && divisor.isNegative())){result.setNegative(true);}
 	
-	int maxlengthofresult = std::max(getSize(), divisor.getSize());
-	result.resize(maxlengthofresult);
+	if(usegmp){ // https://gmplib.org/manual/Integer-Division
+		int maxlengthofresult = std::max(getSize(), divisor.getSize());
+		char* res = new char[maxlengthofresult + 1];
+		BigInteger ret("0");
 
-	std::size_t numerator_index = 1;
-	BigInteger partial_numerator(getNumber(false).substr(0, 1).c_str());
-	for(; partial_numerator.compare_digits(divisor) == -1 && numerator_index <= getSize(); numerator_index++){
-		std::string num = partial_numerator.getNumber(false) + getNumber(false).substr(numerator_index, 1);
-		// https://stackoverflow.com/a/6868389/9298528
-		// placement new
-		// recreates partial_numerator in its own memory region but it could leak memory of pointers 
-		// created on partial_numerator before the placement new so its good practice to run the 
-		// destructor first
-		// (&partial_numerator)->~partial_numerator(); which I wont do bc there arent any pointers (i checked)
-		// and the operation makes the algorithm slower
-		new (&partial_numerator) BigInteger(num.c_str());
-	}
-	
-	int j = 0;
-	for(; numerator_index < getNumber(false).size() || j == 0; j++){
-	
-		if(partial_numerator.compare_digits(divisor) == -1 && numerator_index <= getSize()){
+		mpz_t dividend_gmp;
+		mpz_init(dividend_gmp);
+		mpz_set_str(dividend_gmp, getNumber(false).c_str(), 10);
+
+		mpz_t divisor_gmp;
+		mpz_init(divisor_gmp);
+		mpz_set_str(divisor_gmp, divisor.getNumber(false).c_str(), 10);
+		
+		mpz_t result_gmp;
+		mpz_init(result_gmp);
+
+		if(mod){
+			mpz_mod(result_gmp, dividend_gmp, divisor_gmp);
+		}else{
+			mpz_tdiv_q(result_gmp, dividend_gmp, divisor_gmp);
+		}
+
+		mpz_get_str(res, 10, result_gmp);
+		ret = res;
+		ret.setNegative(result.isNegative());
+		mpz_clear(result_gmp);
+		mpz_clear(divisor_gmp);
+		mpz_clear(dividend_gmp);
+		delete[] res;
+		return ret;
+
+	}else{
+		// my textbook implementation of division is just too slow for large rsa key sizes
+		int maxlengthofresult = std::max(getSize(), divisor.getSize());
+		result.resize(maxlengthofresult);
+
+		std::size_t numerator_index = 1;
+		BigInteger partial_numerator(getNumber(false).substr(0, 1).c_str());
+		for(; partial_numerator.compare_digits(divisor) == -1 && numerator_index <= getSize(); numerator_index++){
 			std::string num = partial_numerator.getNumber(false) + getNumber(false).substr(numerator_index, 1);
-
+			// https://stackoverflow.com/a/6868389/9298528
+			// placement new
+			// recreates partial_numerator in its own memory region but it could leak memory of pointers 
+			// created on partial_numerator before the placement new so its good practice to run the 
+			// destructor first
+			// (&partial_numerator)->~partial_numerator(); which I wont do bc there arent any pointers (i checked)
+			// and the operation makes the algorithm slower
 			new (&partial_numerator) BigInteger(num.c_str());
-			numerator_index++;
 		}
 		
-		while(partial_numerator[partial_numerator.getSize()-1] == 0 && partial_numerator.getSize() > 1) partial_numerator.resize(partial_numerator.getSize()-1);
+		int j = 0;
+		for(; numerator_index < getNumber(false).size() || j == 0; j++){
+		
+			if(partial_numerator.compare_digits(divisor) == -1 && numerator_index <= getSize()){
+				std::string num = partial_numerator.getNumber(false) + getNumber(false).substr(numerator_index, 1);
 
-		for(; partial_numerator.compare_digits(divisor) == 0 || partial_numerator.compare_digits(divisor) == 1; result[j]++){
-			partial_numerator.subtract_digits(divisor);
+				new (&partial_numerator) BigInteger(num.c_str());
+				numerator_index++;
+			}
+			
+			while(partial_numerator[partial_numerator.getSize()-1] == 0 && partial_numerator.getSize() > 1) partial_numerator.resize(partial_numerator.getSize()-1);
+
+			for(; partial_numerator.compare_digits(divisor) == 0 || partial_numerator.compare_digits(divisor) == 1; result[j]++){
+				partial_numerator.subtract_digits(divisor);
+			}
 		}
-	}
-	if(mod){return partial_numerator;}
-	else{
-		while(result[result.getSize()-1] == 0 && result.getSize() > std::max<std::size_t>(j,1)) result.resize(result.getSize()-1);
-		result.invertNumber();
-		return result;
+		if(mod){return partial_numerator;}
+		else{
+			while(result[result.getSize()-1] == 0 && result.getSize() > std::max<std::size_t>(j,1)) result.resize(result.getSize()-1);
+			result.invertNumber();
+			return result;
+		}
 	}
 }
 
@@ -509,33 +544,3 @@ std::ostream& operator<< (std::ostream& stream, const BigInteger& b){
 	stream << b.getNumber();
 	return stream;
 }
-/*
-int main(){
-	
-	
-	BigInteger a("658754366326");
-	a.printBinary();
-	
-	BigInteger b("9705457636");
-	b.printBinary();
-	
-	a.bitAnd(b);
-	a.printBinary();
-	a.print();
-	
-	a.bitShiftRight(5);
-	a.printBinary();
-	a.print();
-	
-	a.bitShiftLeft(5);
-	a.printBinary();
-	a.print();
-	
-	a = "5433561313";
-	a.print();
-	a.modpow("53561313", "43561313");
-	a.print();
-	
-	return 0;
-}
-*/

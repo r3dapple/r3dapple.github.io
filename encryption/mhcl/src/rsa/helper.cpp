@@ -1,10 +1,5 @@
 #include "helper.hpp"
 
-bool fileExists(const char *name) {
-    std::ifstream f(name);
-    return f.good();
-}
-
 // To calculate Jacobian symbol of a given number
 BigInteger calculateJacobian(BigInteger a, BigInteger n){
     if (a == 0)
@@ -46,14 +41,14 @@ BigInteger calculateJacobian(BigInteger a, BigInteger n){
 
 
 BigInteger modulo(BigInteger base, BigInteger exponent, BigInteger mod){
-    BigInteger x = 1;
-    BigInteger y = base;
-    while (exponent > 0){
-        if (exponent % 2 == 1)
+    BigInteger x("1");
+    BigInteger y(base);
+    while (exponent > "0"){
+        if (exponent % "2" == "1")
             x = (x * y) % mod;
 
         y = (y * y) % mod;
-        exponent = exponent / 2;
+        exponent = exponent / "2";
     }
 
     return x % mod;
@@ -61,28 +56,26 @@ BigInteger modulo(BigInteger base, BigInteger exponent, BigInteger mod){
 
 
 // To perform the Solovay-Strassen Primality Test
-bool solovoyStrassen(BigInteger p, int iterations)
-{
-    if (p < 2)
+bool solovoyStrassen(BigInteger p, int iterations){
+    if (p < "2")
         return false;
-    if (p != 2 && p % 2 == 0)
+    if (p != "2" && p % "2" == 0)
         return false;
 
-    for (int i = 0; i < iterations; i++)
-    {
+    for (int i = 0; i < iterations; i++){
         // Generate a random number a
-        BigInteger a = BigInteger(rand()) % (p - 1) + 1;
+        BigInteger a = BigInteger(rand()) % (p - "1") + "1";
         BigInteger jacobian = (p + calculateJacobian(a, p)) % p;
-        BigInteger mod = modulo(a, (p - 1) / 2, p);
+        BigInteger mod = modulo(a, (p - "1") / "2", p);
 
-        if (jacobian == 0 || mod != jacobian)
+        if (jacobian == "0" || mod != jacobian)
             return false;
     }
     return true;
 }
 
 BigInteger getLargePrimeQ(int keysize){
-    //srand(time(NULL));
+    srand(time(NULL));
     // begins at 11111111111111111 ... keysize/2 1's
     BigInteger candidate = 1;
     BigInteger one = 1;
@@ -99,11 +92,12 @@ BigInteger getLargePrimeQ(int keysize){
         }
         candidate += rand();
         candidate += rand();
+        //std::cout << "Trying " << candidate << std::endl;
     }
 }
 
 BigInteger getLargePrimeP(int keysize){
-    //srand(time(NULL));
+    srand(time(NULL));
     // begins at 100000000000 ... keysize/2-1 0's and one 1
     BigInteger candidate = 1;
     candidate.bitShiftLeft(((keysize)/2)-1);
@@ -116,5 +110,6 @@ BigInteger getLargePrimeP(int keysize){
         }
         candidate += rand();
         candidate += rand();
+        //std::cout << "Trying " << candidate << std::endl;
     }
 }

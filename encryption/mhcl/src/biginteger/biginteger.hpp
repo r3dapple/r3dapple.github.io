@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstring>
 #include <stdexcept>
+#include <gmp.h>
 #include "dividebyzeroexception.hpp"
 
 class BigInteger{
@@ -24,7 +25,7 @@ class BigInteger{
 		void divide(const BigInteger&);
 		void mod(const BigInteger&);
 		void pow(const BigInteger);
-		void modpow(BigInteger, const BigInteger&);
+		void modpow(const BigInteger&, BigInteger, bool);
 		void bitAnd(const BigInteger&);
 		void bitOr(const BigInteger&);
 		void bitXOr(const BigInteger&);
@@ -67,7 +68,7 @@ class BigInteger{
 		void add_digits(const BigInteger&);
 		void subtract_digits(BigInteger);
 		char compare_digits(const BigInteger&) const;
-		BigInteger divide_digits(const BigInteger&, bool);
+		BigInteger divide_digits(const BigInteger&, bool, bool);
 		std::string getBinaryString() const;
 		void fromBinaryString(const std::string&);
 		void invertNumber();

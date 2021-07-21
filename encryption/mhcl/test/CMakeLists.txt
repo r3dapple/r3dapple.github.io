@@ -1,24 +1,25 @@
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
     find_package (Boost COMPONENTS system filesystem unit_test_framework REQUIRED) # sudo apt-get install libboost-all-dev
+
     include_directories (${MHCL_SOURCE_DIR}/src ${Boost_INCLUDE_DIRS})
 
     add_executable (test_biginteger_constructor test_biginteger_constructor.cpp)
-    target_link_libraries (test_biginteger_constructor biginteger ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries (test_biginteger_constructor biginteger gmp ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
     add_executable (test_biginteger_add test_biginteger_add.cpp)
-    target_link_libraries (test_biginteger_add biginteger ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries (test_biginteger_add biginteger gmp ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
     add_executable (test_biginteger_subtract test_biginteger_subtract.cpp)
-    target_link_libraries (test_biginteger_subtract biginteger ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries (test_biginteger_subtract biginteger gmp ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
     add_executable (test_biginteger_multiply test_biginteger_multiply.cpp)
-    target_link_libraries (test_biginteger_multiply biginteger ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries (test_biginteger_multiply biginteger gmp ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
     add_executable (test_biginteger_divide test_biginteger_divide.cpp)
-    target_link_libraries (test_biginteger_divide biginteger ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries (test_biginteger_divide biginteger gmp ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
     add_executable (test_biginteger_bitand test_biginteger_bitand.cpp)
-    target_link_libraries (test_biginteger_bitand biginteger ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries (test_biginteger_bitand biginteger gmp ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 
     include(CTest)

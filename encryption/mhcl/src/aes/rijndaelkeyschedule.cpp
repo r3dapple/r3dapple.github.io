@@ -1,17 +1,17 @@
-#include "rijndael_key_schedule.hpp"
+#include "rijndaelkeyschedule.hpp"
 
-rijndael_key_schedule::rijndael_key_schedule(const unsigned char* key, int size, galois_field* gfield){
+RijndaelKeySchedule::RijndaelKeySchedule(const unsigned char* key, int size, GaloisField* gfield){
 	this->key_size = size;
 	this->gfield = gfield;
 	expand_key(key, size);
 }
 
-rijndael_key_schedule::~rijndael_key_schedule(){delete[] expanded_key;}
+RijndaelKeySchedule::~RijndaelKeySchedule(){delete[] expanded_key;}
 
-unsigned char* rijndael_key_schedule::getExpandedKey(){return expanded_key;}
-int rijndael_key_schedule::getExpandedKeySize(){return key_size;}
+unsigned char* RijndaelKeySchedule::getExpandedKey(){return expanded_key;}
+int RijndaelKeySchedule::getExpandedKeySize(){return key_size;}
 
-void rijndael_key_schedule::printExpandedKey(){
+void RijndaelKeySchedule::printExpandedKey(){
 	if(expanded_key_length == 0) {std::cout << termcol.red() << "Cant print. Expanded Key Generation must have failed." << termcol.reset() << std::endl; return;}
 	std::cout << std::hex << std::endl;
 	std::cout <<  termcol.blue() << " [---]        Key Scheduling (" <<  termcol.orange() << "RKS" 
@@ -26,7 +26,7 @@ void rijndael_key_schedule::printExpandedKey(){
 	std::cout << std::endl;
 }
 
-void rijndael_key_schedule::rotate(unsigned char *in) {
+void RijndaelKeySchedule::rotate(unsigned char *in) {
 	unsigned char a, c;
 	a = in[0];
 	for(c=0;c<3;c++) 
@@ -35,7 +35,7 @@ void rijndael_key_schedule::rotate(unsigned char *in) {
 	return;
 }
 
-unsigned char rijndael_key_schedule::rcon(unsigned char in) {
+unsigned char RijndaelKeySchedule::rcon(unsigned char in) {
 	unsigned char c = 1;
 	if(in == 0)  
 		return 0; 
@@ -48,7 +48,7 @@ unsigned char rijndael_key_schedule::rcon(unsigned char in) {
 
 /* This is the core key expansion, which, given a 4-byte value,
  * does some scrambling */
-void rijndael_key_schedule::schedule_core(unsigned char *in, unsigned char i) {
+void RijndaelKeySchedule::schedule_core(unsigned char *in, unsigned char i) {
 	char a;
 	/* Rotate the input 8 bits to the left */
 	rotate(in);
@@ -59,7 +59,7 @@ void rijndael_key_schedule::schedule_core(unsigned char *in, unsigned char i) {
 	in[0] ^= rcon(i);
 }
 
-void rijndael_key_schedule::expand_key(const unsigned char* key, int bits){
+void RijndaelKeySchedule::expand_key(const unsigned char* key, int bits){
 	
 	switch(bits){
 		case 128:
@@ -85,7 +85,7 @@ void rijndael_key_schedule::expand_key(const unsigned char* key, int bits){
 	}
 }
 
-void rijndael_key_schedule::expand_key_128() {
+void RijndaelKeySchedule::expand_key_128() {
 	unsigned char t[4];
 	/* c is 16 because the first sub-key is the user-supplied key */
 	unsigned char c = 16;
@@ -111,7 +111,7 @@ void rijndael_key_schedule::expand_key_128() {
 	}
 }
 
-void rijndael_key_schedule::expand_key_192() {
+void RijndaelKeySchedule::expand_key_192() {
 	unsigned char t[4];
 	unsigned char c = 24;
 	unsigned char i = 1;
@@ -132,7 +132,7 @@ void rijndael_key_schedule::expand_key_192() {
 	}
 }
 
-void rijndael_key_schedule::expand_key_256() {
+void RijndaelKeySchedule::expand_key_256() {
 	unsigned char t[4];
 	unsigned char c = 32;
 	unsigned char i = 1;

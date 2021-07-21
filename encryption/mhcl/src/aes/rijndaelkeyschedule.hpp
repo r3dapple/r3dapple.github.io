@@ -1,17 +1,17 @@
-#ifndef rijndael_key_schedule_h
-#define rijndael_key_schedule_h
+#ifndef rijndaelkeyschedule_h
+#define rijndaelkeyschedule_h
 
 #include <iostream>
 #include <cstring>
-#include "galois_field.h"
-#include "termicolor.h"
+#include "galoisfield.hpp"
+#include "termicolor.hpp"
 
-class rijndael_key_schedule{
+class RijndaelKeySchedule{
 
 	public:
 
-		rijndael_key_schedule(const unsigned char*, int, galois_field*);
-		~rijndael_key_schedule();
+		RijndaelKeySchedule(const unsigned char*, int, GaloisField*);
+		~RijndaelKeySchedule();
 		unsigned char* getExpandedKey();
 		void printExpandedKey();
 		unsigned char sbox(unsigned char);
@@ -31,7 +31,7 @@ class rijndael_key_schedule{
 
 		int key_size = 0;
 		unsigned char* expanded_key = {0};
-		galois_field* gfield;
+		GaloisField* gfield;
 		int expanded_key_length = 0;
 		termicolor termcol;
 
