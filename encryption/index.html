@@ -40,9 +40,21 @@
                                 You still can't be sure who sent you the encrypted data. That's what digitial signatures are for. Digitial signatures ensure commitment and authenticity of encrypted data transmissions.
                             </p>
                             <p>
-                                Often it is theorized that quantum computing can more efficiently solve the mathematical problem or prime factorisation and discrete logarithm that the RSA algorithm is based on.
-                                I have written a personal (potentially unsafe) cryptographic library called MHCL. I will visualize it's inner workings.
+                                Often it is theorized that quantum computing can more efficiently solve discrete logarithms that the RSA algorithm is based on.
+                                I have <a href="https://github.com/r3dapple/r3dapple.github.io/tree/main/encryption/mhcl/src">written</a> a personal (potentially unsafe) cryptographic library called MHCL.
+								The main idea is that there are two types of keys, for each type of encryption algorithm and a client accessable crypto context from where the client can choose a crypto strategy.
+								Interaction with the file system is modeled by the class "File Manager" which is a singleton. Names for the patterns are based on Erich Gamma's 
+								book <a href="https://www.amazon.de/Patterns-Elements-Reusable-Object-Oriented-Software/dp/0201633612">"Design Patterns, Patterns Elements Reusable Object Oriented Software"</a>.
+								<img class="preview" src="mhcl_uml.svg" alt="mhcl_class_diagram" width=100% height=100% style="margin-top: 10px">
+								<small class="center">UML Class Diagram of MHCL done with <a href="https://astah.net/">Astah</a></small>
                             </p>
+
+							<h2>Symmetric Encryption: The Advanced Encryption Standard</h2>
+							<p>
+                                You can upload any file here and have a look at the bytes that make up that file:
+
+                            </p>
+
 						</div>
 					</div>
 
